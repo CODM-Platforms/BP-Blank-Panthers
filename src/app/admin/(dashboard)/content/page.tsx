@@ -1,8 +1,8 @@
-import { Image as ImageIcon, Send, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/prisma/db';
 import { toJsDate } from '@/lib/temporal';
-import { createPost } from '@/app/admin/content/actions';
+import CreatePostForm from '@/components/admin/CreatePostForm';
 
 export default async function ContentManager() {
   // Fetch real posts from DB safely
@@ -29,45 +29,7 @@ export default async function ContentManager() {
         {/* Post Editor Panel (Quick Create) */}
         <div className="lg:col-span-2 bg-surface-container-low border border-surface-container-high rounded-xl p-6">
           <h2 className="text-xl font-bold text-on-surface mb-6 border-b border-surface-container-high pb-4">Draft Post</h2>
-          
-          <form className="space-y-6" action={createPost}>
-            <div>
-              <label className="block text-sm font-medium text-outline mb-2">Post Title</label>
-              <input type="text" name="title" required placeholder="e.g., Our Clan Wins Zanzibar Championship" className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-outline mb-2">Category</label>
-                <select name="category" className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container appearance-none">
-                  <option value="NEWS">News</option>
-                  <option value="ACHIEVEMENT">Achievement</option>
-                  <option value="ANNOUNCEMENT">Announcement</option>
-                  <option value="TOURNAMENT">Tournament Result</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-outline mb-2">Publish Date</label>
-                <input type="datetime-local" name="publishedAt" className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-outline mb-2">Content</label>
-              <textarea name="content" required rows={6} placeholder="Write your post here..." className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container resize-none"></textarea>
-            </div>
-
-            <div className="border-2 border-dashed border-surface-container-high rounded-xl p-8 text-center hover:border-primary-container/50 transition-colors cursor-pointer bg-surface-container-lowest/50">
-              <ImageIcon className="w-8 h-8 text-outline mx-auto mb-2" />
-              <p className="text-sm text-outline">Click to upload cover image (or drag and drop)</p>
-            </div>
-
-            <div className="flex justify-end gap-4 pt-4 border-t border-surface-container-high">
-              <button type="submit" className="px-6 py-2 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">
-                <Send className="w-4 h-4" /> Publish Now
-              </button>
-            </div>
-          </form>
+          <CreatePostForm />
         </div>
 
         {/* Recent Posts List */}
