@@ -27,30 +27,30 @@ export default async function MembersDashboard() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white uppercase">Clan Members</h1>
-          <p className="text-panther-text mt-1">Manage approvals, attendance, and discipline.</p>
+          <h1 className="text-3xl font-bold text-on-surface uppercase">Clan Members</h1>
+          <p className="text-outline mt-1">Manage approvals, attendance, and discipline.</p>
         </div>
       </div>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-panther-card border border-panther-border rounded-xl p-4 text-center">
-          <span className="text-2xl font-bold text-white">{stats.total}</span>
-          <p className="text-xs text-panther-text uppercase font-bold mt-1">Total</p>
+        <div className="bg-surface-container-low border border-surface-container-high rounded-xl p-4 text-center">
+          <span className="text-2xl font-bold text-on-surface">{stats.total}</span>
+          <p className="text-xs text-outline uppercase font-bold mt-1">Total</p>
         </div>
-        <div className="bg-panther-card border border-green-500/30 rounded-xl p-4 text-center">
+        <div className="bg-surface-container-low border border-green-500/30 rounded-xl p-4 text-center">
           <span className="text-2xl font-bold text-green-400">{stats.active}</span>
           <p className="text-xs text-green-400/70 uppercase font-bold mt-1">Active</p>
         </div>
-        <div className="bg-panther-card border border-blue-500/30 rounded-xl p-4 text-center">
+        <div className="bg-surface-container-low border border-blue-500/30 rounded-xl p-4 text-center">
           <span className="text-2xl font-bold text-blue-400">{stats.pending}</span>
           <p className="text-xs text-blue-400/70 uppercase font-bold mt-1">Pending</p>
         </div>
-        <div className="bg-panther-card border border-yellow-500/30 rounded-xl p-4 text-center">
+        <div className="bg-surface-container-low border border-yellow-500/30 rounded-xl p-4 text-center">
           <span className="text-2xl font-bold text-yellow-400">{stats.warning}</span>
           <p className="text-xs text-yellow-400/70 uppercase font-bold mt-1">Warning</p>
         </div>
-        <div className="bg-panther-card border border-red-500/30 rounded-xl p-4 text-center">
+        <div className="bg-surface-container-low border border-red-500/30 rounded-xl p-4 text-center">
           <span className="text-2xl font-bold text-red-400">{stats.suspended}</span>
           <p className="text-xs text-red-400/70 uppercase font-bold mt-1">Suspended</p>
         </div>

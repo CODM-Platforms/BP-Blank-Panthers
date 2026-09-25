@@ -31,16 +31,16 @@ export default function MembersTable({ members }: { members: any[] }) {
   }, [members, query, filter]);
 
   return (
-    <div className="bg-panther-card border border-panther-border rounded-xl overflow-hidden">
-      <div className="p-4 border-b border-panther-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-panther-dark/50">
+    <div className="bg-surface-container-low border border-surface-container-high rounded-xl overflow-hidden">
+      <div className="p-4 border-b border-surface-container-high flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-container-lowest/50">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-2.5 w-4 h-4 text-panther-text" />
+          <Search className="absolute left-3 top-2.5 w-4 h-4 text-outline" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search members..."
-            className="w-full pl-9 pr-4 py-2 bg-panther-dark border border-panther-border rounded-lg text-sm text-white focus:outline-none focus:border-panther-gold"
+            className="w-full pl-9 pr-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container"
           />
         </div>
         <div className="flex gap-2 w-full sm:w-auto overflow-x-auto">
@@ -50,8 +50,8 @@ export default function MembersTable({ members }: { members: any[] }) {
               onClick={() => setFilter(f.key)}
               className={
                 filter === f.key
-                  ? 'px-3 py-1 bg-panther-gold text-panther-dark rounded font-bold text-sm whitespace-nowrap'
-                  : 'px-3 py-1 bg-panther-dark border border-panther-border text-panther-text hover:text-white rounded text-sm whitespace-nowrap'
+                  ? 'px-3 py-1 bg-primary-container text-surface-container-lowest rounded font-bold text-sm whitespace-nowrap'
+                  : 'px-3 py-1 bg-surface-container-lowest border border-surface-container-high text-outline hover:text-on-surface rounded text-sm whitespace-nowrap'
               }
             >
               {f.label}
@@ -62,13 +62,13 @@ export default function MembersTable({ members }: { members: any[] }) {
 
       <div className="overflow-x-auto">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center text-panther-text">
+          <div className="p-8 text-center text-outline">
             No members match this search/filter.
           </div>
         ) : (
           <table className="w-full text-left border-collapse min-w-[600px]">
             <thead>
-              <tr className="bg-panther-dark border-b border-panther-border text-xs text-panther-text uppercase tracking-wider">
+              <tr className="bg-surface-container-lowest border-b border-surface-container-high text-xs text-outline uppercase tracking-wider">
                 <th className="p-4 font-medium">Member</th>
                 <th className="p-4 font-medium">Status</th>
                 <th className="p-4 font-medium">Attendance</th>
@@ -78,19 +78,19 @@ export default function MembersTable({ members }: { members: any[] }) {
             </thead>
             <tbody>
               {filtered.map((member) => (
-                <tr key={member.id} className="border-b border-panther-border/50 hover:bg-panther-dark/30 transition-colors">
+                <tr key={member.id} className="border-b border-surface-container-high/50 hover:bg-surface-container-lowest/30 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-panther-dark border border-panther-border flex items-center justify-center overflow-hidden">
+                      <div className="w-10 h-10 rounded-full bg-surface-container-lowest border border-surface-container-high flex items-center justify-center overflow-hidden">
                         {member.profilePicture ? (
                           <img src={member.profilePicture} alt={member.codmUsername} className="w-full h-full object-cover" />
                         ) : (
-                          <Users className="w-5 h-5 text-panther-text" />
+                          <Users className="w-5 h-5 text-outline" />
                         )}
                       </div>
                       <div>
-                        <div className="font-bold text-white">{member.fullName}</div>
-                        <div className="text-xs text-panther-gold font-mono">{member.codmUsername}</div>
+                        <div className="font-bold text-on-surface">{member.fullName}</div>
+                        <div className="text-xs text-primary-container font-mono">{member.codmUsername}</div>
                       </div>
                     </div>
                   </td>
@@ -99,27 +99,27 @@ export default function MembersTable({ members }: { members: any[] }) {
                     {member.status === 'ACTIVE' && <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded border border-green-500/20"><ShieldCheck className="w-3 h-3"/> Active</span>}
                     {member.status === 'WARNING' && <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-500/10 text-yellow-400 text-xs rounded border border-yellow-500/20"><AlertTriangle className="w-3 h-3"/> Warning</span>}
                     {member.status === 'SUSPENDED' && <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-400 text-xs rounded border border-red-500/20"><Ban className="w-3 h-3"/> Suspended</span>}
-                    {(member.status === 'INACTIVE' || member.status === 'REMOVED') && <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-container-high text-panther-text text-xs rounded border border-panther-border">{member.status}</span>}
+                    {(member.status === 'INACTIVE' || member.status === 'REMOVED') && <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-container-high text-outline text-xs rounded border border-surface-container-high">{member.status}</span>}
                     {member.approvedBy && (
-                      <div className="text-[11px] text-panther-text mt-1">Approved by {member.approvedBy.name}</div>
+                      <div className="text-[11px] text-outline mt-1">Approved by {member.approvedBy.name}</div>
                     )}
                   </td>
                   <td className="p-4">
-                    <div className="font-bold text-white">
+                    <div className="font-bold text-on-surface">
                       {member.tournamentsInvited > 0 ? `${Math.round((member.tournamentsAttended / member.tournamentsInvited) * 100)}%` : 'N/A'}
                     </div>
-                    <div className="text-xs text-panther-text">Tournaments</div>
+                    <div className="text-xs text-outline">Tournaments</div>
                   </td>
-                  <td className="p-4 text-sm text-panther-text">{toJsDate(member.createdAt).toLocaleDateString()}</td>
+                  <td className="p-4 text-sm text-outline">{toJsDate(member.createdAt).toLocaleDateString()}</td>
                   <td className="p-4 text-right">
                     {member.status === 'PENDING' ? (
                       <form action={`/api/members/${member.id}/approve`} method="POST">
-                        <button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm font-bold transition-colors">
+                        <button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-on-surface rounded text-sm font-bold transition-colors">
                           Approve
                         </button>
                       </form>
                     ) : (
-                      <Link href={`/admin/members/${member.id}`} className="text-sm text-panther-text hover:text-white underline">
+                      <Link href={`/admin/members/${member.id}`} className="text-sm text-outline hover:text-on-surface underline">
                         Manage
                       </Link>
                     )}
