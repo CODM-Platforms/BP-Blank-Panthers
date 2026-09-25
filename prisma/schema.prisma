@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// MULTI-TENANT SAAS ARCHITECTURE
+model Clan {
+  id          String   @id @default(cuid())
+  name        String
+  tag         String   // e.g., ẞP.ঐ
+  logo        String?
+  description String?  @db.Text
+  
+  users       User[]
+  members     Member[]
+  tournaments Tournament[]
+  posts       Post[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  SUPER_ADMIN // Platform owner
+  CLAN_MASTER // Clan owner
+  TOURNAMENT_MANAGER
+  MODERATOR
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(MODERATOR)
+  
+  clanId    String?
+  clan      Clan?    @relation(fields: [clanId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  auditLogs AuditLog[]
+  posts       Post[]
+}
+
+enum MemberStatus {
+  PENDING
+  APPROVED
+  ACTIVE
+  WARNING
+  SUSPENDED
+  INACTIVE
+  REMOVED
+}
+
+model Member {
+  id              String       @id @default(cuid())
+  
+  clanId          String
+  clan            Clan         @relation(fields: [clanId], references: [id])
+  
+  fullName        String
+  codmUsername    String       @unique
+  codmUid         String       @unique
+  playerId        String       @unique
+  whatsappNumber  String       @unique
+  deviceModel     String
+  deviceSerial    String       // Store only last 4 digits
+  country         String
+  region          String
+  preferredMode   String       // BR, MP, Both
+  profilePicture  String?
+  status          MemberStatus @default(PENDING)
+  
+  // Activity Tracking
+  tournamentsInvited   Int     @default(0)
+  tournamentsConfirmed Int     @default(0)
+  tournamentsAttended  Int     @default(0)
+  tournamentsMissed    Int     @default(0)
+  tournamentsDeclined  Int     @default(0)
+  
+  suspensionEnd        DateTime?
+  adminNotes           String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants Participant[]
+}
+
+enum GameMode {
+  BR
+  MP
+  CUSTOM
+}
+
+enum TournamentStatus {
+  DRAFT
+  PUBLISHED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model Tournament {
+  id              String           @id @default(cuid())
+  
+  clanId          String
+  clan            Clan             @relation(fields: [clanId], references: [id])
+  
+  name            String
+  description     String?          @db.Text
+  game            String           @default("Call of Duty Mobile")
+  mode            GameMode
+  teamSize        Int
+  maxPlayers      Int
+  tournamentDate  DateTime
+  registrationEnd DateTime
+  status          TournamentStatus @default(DRAFT)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants Participant[]
+  teams        Team[]
+}
+
+enum AttendanceStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+  ATTENDED
+  NO_SHOW
+}
+
+model Participant {
+  id                 String           @id @default(cuid())
+  
+  memberId           String
+  member             Member           @relation(fields: [memberId], references: [id])
+  
+  tournamentId       String
+  tournament         Tournament       @relation(fields: [tournamentId], references: [id])
+  
+  attendanceStatus   AttendanceStatus @default(PENDING)
+  declineReason      String?          @db.Text
+  
+  secureToken        String           @unique // Passwordless Auth
+  
+  teamId             String?
+  team               Team?            @relation(fields: [teamId], references: [id])
+  seatNumber         Int?
+
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([memberId, tournamentId])
+}
+
+model Team {
+  id           String      @id @default(cuid())
+  name         String
+  
+  tournamentId String
+  tournament   Tournament  @relation(fields: [tournamentId], references: [id])
+  
+  placement    Int?
+  totalKills   Int?        @default(0)
+  totalPoints  Int?        @default(0)
+
+  participants Participant[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  details   String   @db.Text
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum PostCategory {
+  NEWS
+  ACHIEVEMENT
+  ANNOUNCEMENT
+  TOURNAMENT
+}
+
+model Post {
+  id          String       @id @default(cuid())
+  
+  clanId      String
+  clan        Clan         @relation(fields: [clanId], references: [id])
+  
+  title       String
+  content     String       @db.Text
+  category    PostCategory @default(NEWS)
+  imageUrl    String?
+  publishedAt DateTime?
+  
+  authorId    String
+  author      User         @relation(fields: [authorId], references: [id])
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}

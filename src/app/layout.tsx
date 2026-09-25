@@ -10,17 +10,29 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'MyApp',
-    template: '%s | MyApp',
+    default: 'BP Black Panthers',
+    template: '%s | BP Black Panthers',
   },
-  description: 'A production-ready Next.js application',
-  keywords: ['nextjs', 'react', 'typescript'],
-  authors: [{ name: 'Your Name' }],
+  description: 'Official clan hub for ẞP.ঐ [ BLACK PANTHERS ] CODM Esports.',
+  keywords: ['codm', 'esports', 'black panthers', 'clan', 'tournaments'],
+  icons: {
+    icon: '/logo/BP-BlackPanthers.jpeg',
+    apple: '/logo/BP-BlackPanthers.jpeg',
+  },
   openGraph: {
+    title: 'BP Black Panthers',
+    description: 'Official clan hub for ẞP.ঐ [ BLACK PANTHERS ] CODM Esports.',
     type: 'website',
     locale: 'en_US',
-    url: process.env.NEXT_PUBLIC_APP_URL,
-    siteName: 'MyApp',
+    siteName: 'BP Black Panthers',
+    images: [
+      {
+        url: '/logo/BP-BlackPanthers.jpeg',
+        width: 800,
+        height: 800,
+        alt: 'BP Black Panthers Logo',
+      },
+    ],
   },
 };
 
@@ -31,7 +43,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased bg-panther-dark`}>
         {children}
       </body>
     </html>
