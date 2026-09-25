@@ -203,6 +203,7 @@ async function main() {
       console.log(`Created ${admin.name} <${admin.email}>`);
     } else {
       await db.orm.public.User.where({ id: existingUser.id }).update({
+        name: admin.name,
         email: admin.email,
         password: hashed,
         role: admin.role,
