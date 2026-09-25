@@ -18,6 +18,7 @@ export default function GlobalHeader() {
         <Link href="/" className="font-label-sm text-label-sm tracking-widest uppercase text-outline hover:text-primary-container transition-colors">Home</Link>
         <Link href="/roster" className="font-label-sm text-label-sm tracking-widest uppercase text-outline hover:text-primary-container transition-colors">Roster</Link>
         <Link href="/tournaments" className="font-label-sm text-label-sm tracking-widest uppercase text-outline hover:text-primary-container transition-colors">Tournaments</Link>
+        <Link href="/news" className="font-label-sm text-label-sm tracking-widest uppercase text-outline hover:text-primary-container transition-colors">Intel</Link>
         <Link href="/join" className="font-label-sm text-label-sm tracking-widest uppercase text-outline hover:text-primary-container transition-colors flex items-center gap-1">
           <span className="material-symbols-outlined text-[14px]">how_to_reg</span> Recruitment
         </Link>
