@@ -17,6 +17,7 @@ interface SeedMemberProfile {
   region: string;
   preferredMode: PreferredMode;
   profilePicture?: string; // path under public/, e.g. /members/bp404.jpeg
+  adminNotes?: string;
 }
 
 interface SeedAdmin {
@@ -74,8 +75,54 @@ const admins: SeedAdmin[] = [
       profilePicture: '/members/bpguitzy.jpeg',
     },
   },
-  { name: 'Clan Master Two', email: 'master2@bp-panthers.com', role: 'CLAN_MASTER', isLead: false, passwordEnv: 'SEED_MASTER2_PASSWORD' },
-  { name: 'Clan Master Three', email: 'master3@bp-panthers.com', role: 'CLAN_MASTER', isLead: false, passwordEnv: 'SEED_MASTER3_PASSWORD' },
+  {
+    // Placeholder profile - Crady hasn't sent their real player info yet.
+    // Update this block (and re-run the seed) once they do; name/email are
+    // real, everything else is filler until then.
+    name: 'Crady',
+    email: 'master2@bp-panthers.com',
+    role: 'CLAN_MASTER',
+    isLead: false,
+    passwordEnv: 'SEED_MASTER2_PASSWORD',
+    member: {
+      fullName: 'Crady',
+      codmUsername: 'ẞP.ঐCRADY',
+      codmUid: 'PENDING-CRADY-UID',
+      playerId: 'CRADY',
+      whatsappNumber: 'PENDING-CRADY-WHATSAPP',
+      deviceModel: 'Pending',
+      deviceSerial: 'PEND',
+      country: 'Pending',
+      region: 'Pending',
+      preferredMode: 'Both',
+      profilePicture: '/members/bpcrady.jpeg',
+      adminNotes: 'Placeholder profile - awaiting real player details from Crady.',
+    },
+  },
+  {
+    // Placeholder profile - Lenxon hasn't sent their real player info yet.
+    // Update this block (and re-run the seed) once they do; name/email are
+    // real, everything else is filler until then.
+    name: 'Lenxon',
+    email: 'master3@bp-panthers.com',
+    role: 'CLAN_MASTER',
+    isLead: false,
+    passwordEnv: 'SEED_MASTER3_PASSWORD',
+    member: {
+      fullName: 'Lenxon',
+      codmUsername: 'ẞP.ঐLENXON',
+      codmUid: 'PENDING-LENXON-UID',
+      playerId: 'LENXON',
+      whatsappNumber: 'PENDING-LENXON-WHATSAPP',
+      deviceModel: 'Pending',
+      deviceSerial: 'PEND',
+      country: 'Pending',
+      region: 'Pending',
+      preferredMode: 'Both',
+      profilePicture: '/members/bplenxon.jpeg',
+      adminNotes: 'Placeholder profile - awaiting real player details from Lenxon.',
+    },
+  },
 ];
 
 async function main() {
@@ -112,6 +159,7 @@ async function main() {
           region: m.region,
           preferredMode: m.preferredMode,
           profilePicture: m.profilePicture ?? null,
+          adminNotes: m.adminNotes ?? null,
           status: 'ACTIVE',
         });
         memberId = created.id;
@@ -128,6 +176,7 @@ async function main() {
           region: m.region,
           preferredMode: m.preferredMode,
           profilePicture: m.profilePicture ?? null,
+          adminNotes: m.adminNotes ?? null,
           status: 'ACTIVE',
         });
         memberId = existingMember.id;
