@@ -71,26 +71,23 @@ const admins: SeedAdmin[] = [
     },
   },
   {
-    // Placeholder profile - Crady hasn't sent their real player info yet.
-    // Update this block (and re-run the seed) once they do; name/email are
-    // real, everything else is filler until then.
     name: 'Crady',
-    email: 'master2@bp-panthers.com',
+    email: 'candycharles515@gmail.com',
     role: 'CLAN_MASTER',
     isLead: false,
     passwordEnv: 'SEED_MASTER2_PASSWORD',
     member: {
-      fullName: 'Crady',
-      codmUsername: 'ẞP.ঐCRADY',
-      codmUid: 'PENDING-CRADY-UID',
-      whatsappNumber: 'PENDING-CRADY-WHATSAPP',
-      deviceModel: 'Pending',
-      deviceSerial: 'PEND',
-      country: 'Pending',
+      fullName: 'Dr. Crady',
+      codmUsername: 'ẞP.ঐ.CƦɅD¥',
+      codmUid: '7001568063791759361',
+      whatsappNumber: '+255745793206',
+      deviceModel: 'Samsung A26 5G',
+      deviceSerial: '1C5ZAW',
+      country: 'Tanzania',
       region: 'Pending',
       preferredMode: 'Both',
       profilePicture: '/members/bpcrady.jpeg',
-      adminNotes: 'Placeholder profile - awaiting real player details from Crady.',
+      adminNotes: 'Region within Tanzania not yet provided.',
     },
   },
   {
@@ -143,10 +140,19 @@ async function main() {
     }
     const hashed = await bcrypt.hash(plainPassword, 12);
 
+    // Match the existing account by email first, falling back to name so
+    // that editing an admin's email or IGN in this file (e.g. once someone
+    // sends their real info) updates their existing row instead of quietly
+    // creating a duplicate under the new value.
+    const existingUser = (await db.orm.public.User.where({ email: admin.email }).first())
+      ?? (await db.orm.public.User.where({ name: admin.name }).first());
+
     let memberId: string | undefined;
     if (admin.member) {
       const m = admin.member;
-      const existingMember = await db.orm.public.Member.where({ codmUsername: m.codmUsername }).first();
+      const existingMember = existingUser?.memberId
+        ? await db.orm.public.Member.first({ id: existingUser.memberId })
+        : await db.orm.public.Member.where({ codmUsername: m.codmUsername }).first();
       if (!existingMember) {
         const created = await db.orm.public.Member.create({
           clanId: clan.id,
@@ -168,6 +174,7 @@ async function main() {
       } else {
         await db.orm.public.Member.where({ id: existingMember.id }).update({
           fullName: m.fullName,
+          codmUsername: m.codmUsername,
           codmUid: m.codmUid,
           whatsappNumber: m.whatsappNumber,
           deviceModel: m.deviceModel,
@@ -184,7 +191,6 @@ async function main() {
       }
     }
 
-    const existingUser = await db.orm.public.User.where({ email: admin.email }).first();
     if (!existingUser) {
       await db.orm.public.User.create({
         name: admin.name,
@@ -198,6 +204,7 @@ async function main() {
       console.log(`Created ${admin.name} <${admin.email}>`);
     } else {
       await db.orm.public.User.where({ id: existingUser.id }).update({
+        email: admin.email,
         password: hashed,
         role: admin.role,
         isLead: admin.isLead,
