@@ -84,10 +84,9 @@ const admins: SeedAdmin[] = [
       deviceModel: 'Samsung A26 5G',
       deviceSerial: '1C5ZAW',
       country: 'Tanzania',
-      region: 'Pending',
+      region: 'Dar es Salaam',
       preferredMode: 'Both',
       profilePicture: '/members/bpcrady.jpeg',
-      adminNotes: 'Region within Tanzania not yet provided.',
     },
   },
   {
