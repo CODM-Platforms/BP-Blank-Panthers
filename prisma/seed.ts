@@ -33,7 +33,7 @@ interface SeedAdmin {
 
 const admins: SeedAdmin[] = [
   {
-    name: 'Luqman Hamza',
+    name: '404',
     email: '721luqman@gmail.com',
     role: 'SUPER_ADMIN',
     isLead: false,
@@ -52,7 +52,7 @@ const admins: SeedAdmin[] = [
     },
   },
   {
-    name: 'Khalifa',
+    name: 'Guitzy',
     email: 'Khalifaumaru07@gmail.com',
     role: 'CLAN_MASTER',
     isLead: true,
