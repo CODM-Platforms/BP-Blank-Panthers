@@ -1,4 +1,14 @@
 import 'dotenv/config';
+// Postgres Date/Timestamp columns read and write `Temporal` values, which
+// Node.js doesn't ship globally until 26.8.2+. Polyfill it before the first
+// query - without this, every create/update touching createdAt/updatedAt
+// throws RUNTIME.TEMPORAL_UNAVAILABLE. Assigned manually (rather than via
+// the package's own `temporal-polyfill/full/global` side-effect import)
+// because that entry point's async ESM shape breaks Next.js's webpack build.
+import { Temporal } from 'temporal-polyfill';
+if (!('Temporal' in globalThis)) {
+  (globalThis as unknown as { Temporal: typeof Temporal }).Temporal = Temporal;
+}
 import postgres from '@prisma/orm-postgres/runtime';
 import type { Contract } from './contract.d';
 import contractJson from './contract.json' with { type: 'json' };
