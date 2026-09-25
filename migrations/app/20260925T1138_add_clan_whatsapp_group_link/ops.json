@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.Clan.whatsappGroupLink",
+    "label": "Add column \"whatsappGroupLink\" to \"Clan\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "whatsappGroupLink",
+        "table": "Clan"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"whatsappGroupLink\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Clan",
+          "whatsappGroupLink"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"whatsappGroupLink\"",
+        "sql": "ALTER TABLE \"public\".\"Clan\" ADD COLUMN \"whatsappGroupLink\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"whatsappGroupLink\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Clan",
+          "whatsappGroupLink"
+        ]
+      }
+    ]
+  }
+]

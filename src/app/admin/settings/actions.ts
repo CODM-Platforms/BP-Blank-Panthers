@@ -18,12 +18,13 @@ export async function updateClanProfile(formData: FormData) {
   const name = formData.get('name') as string;
   const tag = formData.get('tag') as string;
   const description = (formData.get('description') as string) || null;
+  const whatsappGroupLink = (formData.get('whatsappGroupLink') as string) || null;
 
   if (!name || !tag) {
     throw new Error('Name and tag are required.');
   }
 
-  await db.orm.public.Clan.where({ id: clan.id }).update({ name, tag, description });
+  await db.orm.public.Clan.where({ id: clan.id }).update({ name, tag, description, whatsappGroupLink });
 
   await db.orm.public.AuditLog.create({
     action: 'CLAN_PROFILE_UPDATED',

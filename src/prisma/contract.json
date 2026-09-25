@@ -178,6 +178,13 @@
                     "precision": 3
                   }
                 }
+              },
+              "whatsappGroupLink": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -264,6 +271,9 @@
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "whatsappGroupLink": {
+                  "column": "whatsappGroupLink"
                 }
               },
               "namespaceId": "public",
@@ -1639,6 +1649,11 @@
                   "typeParams": {
                     "precision": 3
                   }
+                },
+                "whatsappGroupLink": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [],
@@ -2609,7 +2624,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "2756326ed411faced89e1ff142dc8813a68eb6e26b0ae0cff68d5731ee880a13"
+    "storageHash": "88278bf13a339a3d736466447deae33fc5dfc4866fd95e4eb11245fba30937fa"
   },
   "execution": {
     "executionHash": "eb4f07737e6bf02eb6fb4c42b4d2bd83538f71ffad9609ae0a2554eb0a1db1d1",

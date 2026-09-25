@@ -3,14 +3,17 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { toJsDate } from '@/lib/temporal';
 import { updateMemberStatus } from '@/app/admin/members/actions';
+import { buildWhatsAppLink } from '@/lib/whatsapp';
 
 export default async function MemberDetail({ params }: { params: { id: string } }) {
   let member = null;
+  let clan = null;
   try {
     member = await db.orm.public.Member
       .where({ id: params.id })
       .include('approvedBy', (u) => u)
       .first();
+    clan = await db.orm.public.Clan.first();
   } catch (e) {
     console.error('DB error', e);
   }
@@ -20,6 +23,13 @@ export default async function MemberDetail({ params }: { params: { id: string } 
   }
 
   const updateStatus = updateMemberStatus.bind(null, member.id);
+
+  const whatsappInviteLink = clan?.whatsappGroupLink
+    ? buildWhatsAppLink(
+        member.whatsappNumber,
+        `Hey ${member.fullName}! You've been approved to join ${clan.name}. Join our WhatsApp group here: ${clan.whatsappGroupLink}`
+      )
+    : null;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
@@ -35,11 +45,21 @@ export default async function MemberDetail({ params }: { params: { id: string } 
             <span className="material-symbols-outlined text-outline">person</span>
           )}
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold text-on-surface">{member.fullName}</h1>
           <p className="text-primary-container font-mono">{member.codmUsername}</p>
           <p className="text-xs text-outline mt-1">Status: <span className="font-bold">{member.status}</span></p>
         </div>
+        {whatsappInviteLink && (
+          <a
+            href={whatsappInviteLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg font-bold hover:bg-green-500/20 transition-colors flex items-center gap-2 text-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">chat</span> Send WhatsApp Invite
+          </a>
+        )}
       </div>
 
       <div className="bg-surface-container-low border border-surface-container-high rounded-xl p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">

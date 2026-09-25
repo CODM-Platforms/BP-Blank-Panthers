@@ -6,7 +6,7 @@ import { updateClanProfile } from '@/app/admin/settings/actions';
 
 type TabKey = 'profile' | 'attendance' | 'roles';
 
-export default function SettingsTabs({ clan }: { clan: { name: string; tag: string; description: string | null } }) {
+export default function SettingsTabs({ clan }: { clan: { name: string; tag: string; description: string | null; whatsappGroupLink: string | null } }) {
   const [tab, setTab] = useState<TabKey>('profile');
 
   return (
@@ -64,6 +64,11 @@ export default function SettingsTabs({ clan }: { clan: { name: string; tag: stri
               <div>
                 <label className="block text-sm font-medium text-outline mb-2">Description</label>
                 <textarea name="description" defaultValue={clan.description ?? ''} rows={4} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container resize-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-2">WhatsApp Group Link</label>
+                <input type="url" name="whatsappGroupLink" defaultValue={clan.whatsappGroupLink ?? ''} placeholder="https://chat.whatsapp.com/..." className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
+                <p className="text-xs text-outline mt-1">Sent to members when they&apos;re approved.</p>
               </div>
               <div className="pt-2 text-right">
                 <button type="submit" className="px-6 py-3 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">

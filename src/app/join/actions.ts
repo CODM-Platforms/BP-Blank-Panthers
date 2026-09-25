@@ -2,6 +2,7 @@
 
 import { db } from '@/prisma/db';
 import { redirect } from 'next/navigation';
+import { withClanTag } from '@/config/clan';
 
 export async function submitDossier(formData: FormData) {
   try {
@@ -15,11 +16,12 @@ export async function submitDossier(formData: FormData) {
 
     const countryCode = formData.get('countryCode') as string;
     const whatsapp = formData.get('whatsapp') as string;
+    const handle = formData.get('handle') as string;
 
     await db.orm.public.Member.create({
       clanId: clan.id,
       fullName: formData.get('fullName') as string,
-      codmUsername: formData.get('codmUsername') as string,
+      codmUsername: withClanTag(handle),
       codmUid: formData.get('codmUid') as string,
       playerId: formData.get('playerId') as string,
       whatsappNumber: `${countryCode}${whatsapp}`,

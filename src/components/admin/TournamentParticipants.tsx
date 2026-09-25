@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { buildWhatsAppLink } from '@/lib/whatsapp';
 
 type TabKey = 'PENDING' | 'CONFIRMED' | 'DECLINED' | 'ATTENDED' | 'NO_SHOW';
 
@@ -12,7 +13,13 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'NO_SHOW', label: 'No-Show' },
 ];
 
-export default function TournamentParticipants({ participants }: { participants: any[] }) {
+interface Props {
+  participants: any[];
+  tournamentName: string;
+  tournamentDate: string;
+}
+
+export default function TournamentParticipants({ participants, tournamentName, tournamentDate }: Props) {
   const counts: Record<TabKey, number> = {
     PENDING: 0, CONFIRMED: 0, DECLINED: 0, ATTENDED: 0, NO_SHOW: 0,
   };
@@ -22,6 +29,8 @@ export default function TournamentParticipants({ participants }: { participants:
 
   const [tab, setTab] = useState<TabKey>('PENDING');
   const shown = participants.filter((p) => p.attendanceStatus === tab);
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? '';
 
   return (
     <div className="bg-surface-container-low border border-surface-container-high rounded-xl overflow-hidden">
@@ -51,6 +60,7 @@ export default function TournamentParticipants({ participants }: { participants:
                 <th className="pb-3 font-medium">Player</th>
                 <th className="pb-3 font-medium">UID</th>
                 <th className="pb-3 font-medium">Squad</th>
+                {tab === 'PENDING' && <th className="pb-3 font-medium text-right">Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -59,6 +69,21 @@ export default function TournamentParticipants({ participants }: { participants:
                   <td className="py-4 font-bold text-on-surface">{p.member.fullName}</td>
                   <td className="py-4 text-outline font-mono text-sm">{p.member.codmUid}</td>
                   <td className="py-4 text-outline text-sm">{p.team?.name ?? '—'}</td>
+                  {tab === 'PENDING' && (
+                    <td className="py-4 text-right">
+                      <a
+                        href={buildWhatsAppLink(
+                          p.member.whatsappNumber,
+                          `Hey ${p.member.fullName}! You've been invited to ${tournamentName} on ${tournamentDate}. Confirm here: ${appUrl}/confirm/${p.secureToken}`
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded text-sm hover:bg-green-500/20 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">chat</span> Send Invite
+                      </a>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

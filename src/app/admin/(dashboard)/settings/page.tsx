@@ -17,7 +17,7 @@ export default async function AdminSettings() {
       </div>
 
       {clan ? (
-        <SettingsTabs clan={{ name: clan.name, tag: clan.tag, description: clan.description }} />
+        <SettingsTabs clan={{ name: clan.name, tag: clan.tag, description: clan.description, whatsappGroupLink: clan.whatsappGroupLink }} />
       ) : (
         <div className="bg-surface-container-low border border-surface-container-high rounded-xl p-8 text-center text-outline">
           No clan found - seed the database first.

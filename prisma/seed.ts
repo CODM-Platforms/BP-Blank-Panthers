@@ -125,11 +125,20 @@ const admins: SeedAdmin[] = [
   },
 ];
 
+const WHATSAPP_GROUP_LINK = 'https://chat.whatsapp.com/GChzRd9x5ai12Ol94DBa7S';
+
 async function main() {
   let clan = await db.orm.public.Clan.where({ tag: 'BP' }).first();
   if (!clan) {
-    clan = await db.orm.public.Clan.create({ name: 'BP Black Panthers', tag: 'BP' });
+    clan = await db.orm.public.Clan.create({
+      name: 'BP Black Panthers',
+      tag: 'BP',
+      whatsappGroupLink: WHATSAPP_GROUP_LINK,
+    });
     console.log(`Created clan: ${clan.name}`);
+  } else if (!clan.whatsappGroupLink) {
+    await db.orm.public.Clan.where({ id: clan.id }).update({ whatsappGroupLink: WHATSAPP_GROUP_LINK });
+    console.log('Set clan WhatsApp group link.');
   }
 
   for (const admin of admins) {

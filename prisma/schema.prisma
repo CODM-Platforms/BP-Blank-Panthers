@@ -14,6 +14,7 @@ model Clan {
   tag         String   // e.g., ẞP.ঐ
   logo        String?
   description String?  @db.Text
+  whatsappGroupLink String? // https://chat.whatsapp.com/... - shared with approved members
   
   users       User[]
   members     Member[]

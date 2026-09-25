@@ -1,19 +1,26 @@
-import { Users, ShieldCheck } from 'lucide-react';
+import { Users, ShieldCheck, Download } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
 import { toJsDate, sanitizeForClient } from '@/lib/temporal';
-import { publishTournament, cancelTournament } from '@/app/admin/tournaments/actions';
+import { publishTournament, cancelTournament, inviteMembersToTournament } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 
 export default async function TournamentControlCenter({ params }: { params: { id: string } }) {
   let tournament = null;
+  let invitableMembers: any[] = [];
   try {
     tournament = await db.orm.public.Tournament
       .where({ id: params.id })
       .include('participants', (p) => p.include('member', (m) => m).include('team', (t) => t))
       .include('teams', (t) => t)
       .first();
+
+    if (tournament) {
+      const invitedIds = new Set(tournament.participants.map((p: any) => p.memberId));
+      const activeMembers = await db.orm.public.Member.where({ status: 'ACTIVE' }).all();
+      invitableMembers = activeMembers.filter((m) => !invitedIds.has(m.id));
+    }
   } catch (e) {
     console.error('DB error', e);
   }
@@ -27,9 +34,11 @@ export default async function TournamentControlCenter({ params }: { params: { id
   const declined = participants.filter((p: any) => p.attendanceStatus === 'DECLINED').length;
   const pending = participants.filter((p: any) => p.attendanceStatus === 'PENDING').length;
   const requiredSquads = Math.ceil(confirmed / tournament.teamSize) || 0;
+  const tournamentDateStr = toJsDate(tournament.tournamentDate).toLocaleDateString();
 
   const doPublish = publishTournament.bind(null, tournament.id);
   const doCancel = cancelTournament.bind(null, tournament.id);
+  const doInvite = inviteMembersToTournament.bind(null, tournament.id);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -43,12 +52,15 @@ export default async function TournamentControlCenter({ params }: { params: { id
           <div className="flex items-center gap-3 mt-2 text-sm font-mono text-outline">
             <span className="px-2 py-1 bg-surface-container-lowest border border-surface-container-high rounded text-on-surface">{tournament.mode} | {tournament.teamSize}v{tournament.teamSize}</span>
             <span>•</span>
-            <span>{toJsDate(tournament.tournamentDate).toLocaleDateString()}</span>
+            <span>{tournamentDateStr}</span>
             <span>•</span>
             <span className="uppercase">{tournament.status}</span>
           </div>
         </div>
         <div className="flex gap-3">
+          <a href={`/api/admin/tournaments/${tournament.id}/export`} className="px-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-on-surface hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
+            <Download className="w-4 h-4" /> Export Confirmed
+          </a>
           <Link href={`/admin/tournaments/${tournament.id}/teams`} className="px-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-on-surface hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
             <Users className="w-4 h-4" /> Team Builder
           </Link>
@@ -118,8 +130,32 @@ export default async function TournamentControlCenter({ params }: { params: { id
         </div>
       </div>
 
+      {/* Invite Members */}
+      {invitableMembers.length > 0 && (
+        <form action={doInvite} className="bg-surface-container-low border border-surface-container-high rounded-xl p-6">
+          <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary-container" /> Invite Members
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto mb-4">
+            {invitableMembers.map((m) => (
+              <label key={m.id} className="flex items-center gap-2 px-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg cursor-pointer hover:border-primary-container/50 transition-colors">
+                <input type="checkbox" name="memberIds" value={m.id} className="accent-primary-container" />
+                <span className="text-sm text-on-surface truncate">{m.fullName}</span>
+              </label>
+            ))}
+          </div>
+          <button type="submit" className="px-6 py-2 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">
+            Invite Selected
+          </button>
+        </form>
+      )}
+
       {/* Participants Table */}
-      <TournamentParticipants participants={sanitizeForClient(participants)} />
+      <TournamentParticipants
+        participants={sanitizeForClient(participants)}
+        tournamentName={tournament.name}
+        tournamentDate={tournamentDateStr}
+      />
     </div>
   );
 }

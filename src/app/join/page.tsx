@@ -5,6 +5,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
 import { submitDossier } from './actions';
+import { CLAN_TAG } from '@/config/clan';
 
 export default function TacticalJoinPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -189,9 +190,17 @@ export default function TacticalJoinPage() {
                       CODM Callsign
                     </label>
                     <div className="relative flex items-center">
-                      <input name="codmUsername" type="text" required placeholder="e.g. ẞP.ঐ serveraugx" className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md pl-10 focus:outline-none focus:bg-surface-container transition-all" />
-                      <span className="material-symbols-outlined text-[18px] text-outline absolute left-3 pointer-events-none">tag</span>
+                      <span className="font-mono text-body-md text-primary-container absolute left-3 pointer-events-none whitespace-nowrap">{CLAN_TAG}</span>
+                      <input
+                        name="handle"
+                        type="text"
+                        required
+                        placeholder="serveraugx"
+                        style={{ paddingLeft: `${CLAN_TAG.length * 0.6 + 1.5}rem` }}
+                        className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md focus:outline-none focus:bg-surface-container transition-all"
+                      />
                     </div>
+                    <p className="font-label-sm text-label-sm text-outline text-[9px]">Clan tag is added automatically - just type your own handle.</p>
                   </div>
 
                   <div className="flex flex-col gap-space-xs">

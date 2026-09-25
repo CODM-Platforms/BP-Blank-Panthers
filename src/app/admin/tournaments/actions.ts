@@ -4,6 +4,7 @@ import { db } from '@/prisma/db';
 import { getSessionUser } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { randomUUID } from 'crypto';
 
 export async function createTournament(formData: FormData) {
   const actor = await getSessionUser();
@@ -66,6 +67,46 @@ export async function publishTournament(tournamentId: string) {
   revalidatePath('/admin');
   revalidatePath(`/admin/tournaments/${tournamentId}`);
   revalidatePath('/tournaments');
+}
+
+export async function inviteMembersToTournament(tournamentId: string, formData: FormData) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const memberIds = formData.getAll('memberIds') as string[];
+
+  for (const memberId of memberIds) {
+    try {
+      await db.orm.public.Participant.create({
+        memberId,
+        tournamentId,
+        attendanceStatus: 'PENDING',
+        secureToken: randomUUID(),
+      });
+
+      const member = await db.orm.public.Member.first({ id: memberId });
+      if (member) {
+        await db.orm.public.Member.where({ id: memberId }).update({
+          tournamentsInvited: member.tournamentsInvited + 1,
+        });
+      }
+    } catch (e) {
+      console.error(`Failed to invite member ${memberId} - likely already invited.`, e);
+    }
+  }
+
+  if (memberIds.length > 0) {
+    await db.orm.public.AuditLog.create({
+      action: 'TOURNAMENT_MEMBERS_INVITED',
+      details: `${memberIds.length} member(s) invited to tournament ${tournamentId} by ${actor.name} (${actor.id}).`,
+      userId: actor.id,
+    });
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  redirect(`/admin/tournaments/${tournamentId}`);
 }
 
 export async function cancelTournament(tournamentId: string) {
