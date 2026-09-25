@@ -12,6 +12,7 @@ export default async function MemberDetail({ params }: { params: { id: string } 
     member = await db.orm.public.Member
       .where({ id: params.id })
       .include('approvedBy', (u) => u)
+      .include('user', (u) => u)
       .first();
     clan = await db.orm.public.Clan.first();
   } catch (e) {
@@ -24,7 +25,9 @@ export default async function MemberDetail({ params }: { params: { id: string } 
 
   const updateStatus = updateMemberStatus.bind(null, member.id);
 
-  const whatsappInviteLink = clan?.whatsappGroupLink
+  const isStaff = !!member.user;
+
+  const whatsappInviteLink = clan?.whatsappGroupLink && !isStaff
     ? buildWhatsAppLink(
         member.whatsappNumber,
         `Hey ${member.fullName}! You've been approved to join ${clan.name}. Join our WhatsApp group here: ${clan.whatsappGroupLink}`
@@ -46,7 +49,14 @@ export default async function MemberDetail({ params }: { params: { id: string } 
           )}
         </div>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-on-surface">{member.fullName}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-on-surface">{member.fullName}</h1>
+            {member.user && (
+              <span className="px-2 py-0.5 bg-primary-container/10 border border-primary-container/30 text-primary-container text-xs rounded-full uppercase font-bold">
+                {member.user.role.replace('_', ' ')}
+              </span>
+            )}
+          </div>
           <p className="text-primary-container font-mono">{member.codmUsername}</p>
           <p className="text-xs text-outline mt-1">Status: <span className="font-bold">{member.status}</span></p>
         </div>

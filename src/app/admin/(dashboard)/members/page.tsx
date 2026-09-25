@@ -5,14 +5,22 @@ import { sanitizeForClient } from '@/lib/temporal';
 export default async function MembersDashboard() {
   // Fetch real members from the database
   // We use a try-catch so the page doesn't crash if the DB isn't seeded yet
+  let commandStaff: any[] = [];
   let members: any[] = [];
   const stats = { total: 0, active: 0, pending: 0, warning: 0, suspended: 0 };
 
   try {
-    members = await db.orm.public.Member
+    const all = await db.orm.public.Member
       .orderBy((m) => m.createdAt.desc())
       .include('approvedBy', (u) => u)
+      .include('user', (u) => u)
       .all();
+
+    // Admins/clan masters are also linked as members so they can join
+    // tournaments, but they're staff, not applicants - keep them out of the
+    // regular roster list and its approval/discipline stats.
+    commandStaff = all.filter((m: any) => m.user);
+    members = all.filter((m: any) => !m.user);
 
     stats.total = members.length;
     stats.active = members.filter(m => m.status === 'ACTIVE').length;
@@ -31,6 +39,30 @@ export default async function MembersDashboard() {
           <p className="text-outline mt-1">Manage approvals, attendance, and discipline.</p>
         </div>
       </div>
+
+      {/* Command Staff */}
+      {commandStaff.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-bold text-on-surface uppercase">Command Staff</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {commandStaff.map((m) => (
+              <div key={m.id} className="bg-surface-container-low border border-surface-container-high rounded-xl p-4 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-surface-container-lowest border border-surface-container-high overflow-hidden flex items-center justify-center shrink-0">
+                  {m.profilePicture ? (
+                    <img src={m.profilePicture} alt={m.fullName} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="material-symbols-outlined text-outline">person</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold text-on-surface truncate">{m.fullName}</div>
+                  <div className="text-xs text-primary-container font-mono truncate">{m.user.role.replace('_', ' ')}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
