@@ -4,6 +4,12 @@ import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
 import { toJsDate } from '@/lib/temporal';
 
+// No dynamic route segment and no cookies()/headers() call here, so Next
+// would otherwise prerender this once at build time and Vercel would keep
+// serving that frozen snapshot forever - roster/tournament/post changes
+// (including a direct DB fix) would never show up without a full redeploy.
+export const dynamic = 'force-dynamic';
+
 function loadActiveTournaments() {
   return db.orm.public.Tournament
     .where({ status: 'PUBLISHED' })

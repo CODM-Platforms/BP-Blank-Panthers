@@ -4,6 +4,10 @@ import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
 import { toJsDate } from '@/lib/temporal';
 
+// See src/app/page.tsx - without this, Next prerenders this list once at
+// build time and Vercel serves that frozen snapshot until the next deploy.
+export const dynamic = 'force-dynamic';
+
 export default async function PublicTournaments() {
   let tournaments: any[] = [];
   try {
