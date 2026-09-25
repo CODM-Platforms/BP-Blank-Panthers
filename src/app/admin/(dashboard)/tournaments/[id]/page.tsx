@@ -56,6 +56,9 @@ export default async function TournamentControlCenter({ params }: { params: { id
   const pending = participants.filter((p: any) => p.attendanceStatus === 'PENDING').length;
   const requiredSquads = Math.ceil(confirmed / tournament.teamSize) || 0;
   const tournamentDateStr = toJsDate(tournament.tournamentDate).toLocaleDateString();
+  const scheduleStr = tournament.tournamentEnd
+    ? `${toJsDate(tournament.tournamentDate).toLocaleString()} → ${toJsDate(tournament.tournamentEnd).toLocaleString()}`
+    : tournamentDateStr;
 
   const doPublish = publishTournament.bind(null, tournament.id);
   const doCancel = cancelTournament.bind(null, tournament.id);
@@ -74,7 +77,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
           <div className="flex items-center gap-3 mt-2 text-sm font-mono text-outline">
             <span className="px-2 py-1 bg-surface-container-lowest border border-surface-container-high rounded text-on-surface">{tournament.mode} | {tournament.teamSize}v{tournament.teamSize}</span>
             <span>•</span>
-            <span>{tournamentDateStr}</span>
+            <span>{scheduleStr}</span>
             <span>•</span>
             <span className="uppercase">{tournament.status}</span>
           </div>

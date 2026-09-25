@@ -81,14 +81,20 @@ export default function CreateTournament() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-outline mb-1">Tournament Date & Time</label>
-                <input type="datetime-local" name="tournamentDate" required className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-outline mb-1">Registration Deadline</label>
                 <input type="datetime-local" name="registrationEnd" required className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
               </div>
+              <div></div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Start Time</label>
+                <input type="datetime-local" name="tournamentDate" required className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">End Time</label>
+                <input type="datetime-local" name="tournamentEnd" required className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+              </div>
             </div>
+            <p className="text-xs text-outline">Attendance is marked automatically once the End Time passes.</p>
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-4 border-t border-surface-container-high">

@@ -1156,6 +1156,16 @@
                   }
                 }
               },
+              "tournamentEnd": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -1267,6 +1277,9 @@
                 },
                 "tournamentDate": {
                   "column": "tournamentDate"
+                },
+                "tournamentEnd": {
+                  "column": "tournamentEnd"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -2458,6 +2471,14 @@
                     "precision": 3
                   }
                 },
+                "tournamentEnd": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamp-temporal@1",
                   "nativeType": "timestamp",
@@ -2765,7 +2786,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "4ed56cdd12e86a41742c3476c0d9426d891d9485976da8c6d06eb8f73fa4e753"
+    "storageHash": "905b22516267fa22fa951888e9c5dc7e769b63c4f872a1e5d36022f21d8bc7a3"
   },
   "execution": {
     "executionHash": "89a20b8aea7a7a1a83e9af714c3cc81e79b2ede71ec9a792f92e52630a14d80f",

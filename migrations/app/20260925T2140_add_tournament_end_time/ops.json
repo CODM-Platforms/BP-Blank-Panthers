@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.Tournament.tournamentEnd",
+    "label": "Add column \"tournamentEnd\" to \"Tournament\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "tournamentEnd",
+        "table": "Tournament"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"tournamentEnd\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Tournament",
+          "tournamentEnd"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"tournamentEnd\"",
+        "sql": "ALTER TABLE \"public\".\"Tournament\" ADD COLUMN \"tournamentEnd\" timestamp(3)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"tournamentEnd\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Tournament",
+          "tournamentEnd"
+        ]
+      }
+    ]
+  }
+]

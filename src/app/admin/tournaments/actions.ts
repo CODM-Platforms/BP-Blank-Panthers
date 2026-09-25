@@ -23,10 +23,14 @@ export async function createTournament(formData: FormData) {
   const teamSize = Number(formData.get('teamSize'));
   const maxPlayers = Number(formData.get('maxPlayers'));
   const tournamentDate = new Date(formData.get('tournamentDate') as string);
+  const tournamentEnd = new Date(formData.get('tournamentEnd') as string);
   const registrationEnd = new Date(formData.get('registrationEnd') as string);
 
-  if (!name || !mode || !teamSize || !maxPlayers || isNaN(tournamentDate.getTime()) || isNaN(registrationEnd.getTime())) {
+  if (!name || !mode || !teamSize || !maxPlayers || isNaN(tournamentDate.getTime()) || isNaN(tournamentEnd.getTime()) || isNaN(registrationEnd.getTime())) {
     throw new Error('Missing or invalid tournament fields.');
+  }
+  if (tournamentEnd.getTime() <= tournamentDate.getTime()) {
+    throw new Error('End Time must be after Start Time.');
   }
 
   const tournament = await db.orm.public.Tournament.create({
@@ -36,6 +40,7 @@ export async function createTournament(formData: FormData) {
     teamSize,
     maxPlayers,
     tournamentDate: toTemporalDateTime(tournamentDate),
+    tournamentEnd: toTemporalDateTime(tournamentEnd),
     registrationEnd: toTemporalDateTime(registrationEnd),
     status: 'PUBLISHED',
   });
@@ -154,7 +159,11 @@ export async function autoProgressAttendance(tournamentId: string) {
   const tournament = await db.orm.public.Tournament.first({ id: tournamentId });
   if (!tournament) return;
   if (tournament.status === 'DRAFT' || tournament.status === 'COMPLETED' || tournament.status === 'CANCELLED') return;
-  if (toJsDate(tournament.tournamentDate).getTime() > Date.now()) return;
+  // Only promote once the event has actually ended, not merely started -
+  // older tournaments created before tournamentEnd existed fall back to
+  // the start time.
+  const effectiveEnd = tournament.tournamentEnd ? toJsDate(tournament.tournamentEnd) : toJsDate(tournament.tournamentDate);
+  if (effectiveEnd.getTime() > Date.now()) return;
 
   const stillConfirmed = await db.orm.public.Participant
     .where({ tournamentId })
