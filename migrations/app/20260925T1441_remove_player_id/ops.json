@@ -1,0 +1,83 @@
+[
+  {
+    "id": "dropIndex.Member.Member_playerId_key",
+    "label": "Drop index \"Member_playerId_key\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Member_playerId_key",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Member_playerId_key\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Member_playerId_key\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop index \"Member_playerId_key\"",
+        "sql": "DROP INDEX \"public\".\"Member_playerId_key\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Member_playerId_key\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Member_playerId_key\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropColumn.Member.playerId",
+    "label": "Drop column \"playerId\" from \"Member\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "playerId",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"playerId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Member",
+          "playerId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"playerId\"",
+        "sql": "ALTER TABLE \"public\".\"Member\" DROP COLUMN \"playerId\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"playerId\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Member",
+          "playerId"
+        ]
+      }
+    ]
+  }
+]
