@@ -2,7 +2,7 @@ import { Users, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
-import { toJsDate } from '@/lib/temporal';
+import { toJsDate, sanitizeForClient } from '@/lib/temporal';
 import { publishTournament, cancelTournament } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 
@@ -119,7 +119,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
       </div>
 
       {/* Participants Table */}
-      <TournamentParticipants participants={participants} />
+      <TournamentParticipants participants={sanitizeForClient(participants)} />
     </div>
   );
 }

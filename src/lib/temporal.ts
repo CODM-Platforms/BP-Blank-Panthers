@@ -42,3 +42,39 @@ export function toJsDate(value: unknown): Date {
 
   return new Date(String(value));
 }
+
+function isTemporalLike(value: unknown): boolean {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    !(value instanceof Date) &&
+    'year' in value &&
+    'month' in value &&
+    'day' in value
+  );
+}
+
+/**
+ * Recursively replaces any Temporal-like value in an object/array graph
+ * with a plain JS Date. Required before passing any DB row (or anything
+ * containing one) as a prop to a 'use client' component - React Server
+ * Components serialize that crossing with JSON.stringify internally, which
+ * calls the Temporal value's .toJSON(), hitting the exact same broken
+ * internal path as .toString() (see toJsDate above). Passing a raw
+ * Temporal value into a client component crashes the build even if no
+ * page code ever reads that field.
+ */
+export function sanitizeForClient<T>(value: T): T {
+  if (value == null) return value;
+  if (value instanceof Date) return value;
+  if (isTemporalLike(value)) return toJsDate(value) as unknown as T;
+  if (Array.isArray(value)) return value.map((v) => sanitizeForClient(v)) as unknown as T;
+  if (typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = sanitizeForClient(v);
+    }
+    return out as T;
+  }
+  return value;
+}

@@ -1,5 +1,6 @@
 import { db } from '@/prisma/db';
 import MembersTable from '@/components/admin/MembersTable';
+import { sanitizeForClient } from '@/lib/temporal';
 
 export default async function MembersDashboard() {
   // Fetch real members from the database
@@ -55,7 +56,7 @@ export default async function MembersDashboard() {
         </div>
       </div>
 
-      <MembersTable members={members} />
+      <MembersTable members={sanitizeForClient(members)} />
     </div>
   );
 }
