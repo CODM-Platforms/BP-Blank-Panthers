@@ -27,13 +27,32 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     .include('team', (t) => t)
     .all();
 
-  const header = ['Full Name', 'CODM Username', 'CODM UID', 'Player ID', 'WhatsApp', 'Team'];
+  const header = [
+    'Full Name',
+    'Player ID',
+    'CODM IGN',
+    'UID',
+    'Device',
+    'Device Serial',
+    'Phone/WhatsApp',
+    'Country',
+    'Region',
+    'Preferred Mode',
+    'Status',
+    'Team',
+  ];
   const rows = participants.map((p: any) => [
     p.member.fullName,
+    p.member.playerId,
     p.member.codmUsername,
     p.member.codmUid,
-    p.member.playerId,
+    p.member.deviceModel,
+    p.member.deviceSerial,
     p.member.whatsappNumber,
+    p.member.country,
+    p.member.region,
+    p.member.preferredMode,
+    p.member.status,
     p.team?.name ?? '',
   ]);
 
