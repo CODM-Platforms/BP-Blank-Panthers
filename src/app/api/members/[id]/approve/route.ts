@@ -14,21 +14,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
   }
 
-  // Every approval is attributed to the designated lead clan master, no
-  // matter which admin/clan master actually clicked approve. The real actor
-  // is still recorded on the AuditLog entry below for internal traceability.
-  const lead = await db.orm.public.User.where({ isLead: true }).first();
-  const approvedById = lead?.id ?? actor.id;
-
   try {
     await db.orm.public.Member.where({ id: params.id }).update({
       status: 'ACTIVE',
-      approvedById,
+      approvedById: actor.id,
     });
 
     await db.orm.public.AuditLog.create({
       action: 'MEMBER_APPROVED',
-      details: `Member ${params.id} approved by ${actor.name} (${actor.id}). Displayed approver: ${lead?.name ?? actor.name}.`,
+      details: `Member ${params.id} approved by ${actor.name} (${actor.id}).`,
       userId: actor.id,
     });
   } catch (error) {
