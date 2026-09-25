@@ -1,13 +1,13 @@
 import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
 
-const LIME = '#b1f800';
+const ACCENT = '#E8262C';
 const DARK = '#111318';
 const MUTED = '#5b6270';
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontFamily: 'Helvetica', backgroundColor: '#ffffff', color: DARK },
 
-  headerRow: { flexDirection: 'row', alignItems: 'center', borderBottom: `3 solid ${LIME}`, paddingBottom: 12, marginBottom: 20 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', borderBottom: `3 solid ${ACCENT}`, paddingBottom: 12, marginBottom: 20 },
   logo: { width: 44, height: 44, borderRadius: 6, marginRight: 12 },
   clanName: { fontSize: 16, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 1 },
   clanSubtitle: { fontSize: 8, color: MUTED, textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 },
@@ -17,11 +17,11 @@ const styles = StyleSheet.create({
   meta: { fontSize: 10, color: MUTED, marginBottom: 18 },
 
   statsRow: { flexDirection: 'row', marginBottom: 22 },
-  statBox: { flex: 1, backgroundColor: '#f6fbe6', borderLeft: `3 solid ${LIME}`, borderRadius: 4, padding: 10, marginRight: 10 },
+  statBox: { flex: 1, backgroundColor: '#fdecec', borderLeft: `3 solid ${ACCENT}`, borderRadius: 4, padding: 10, marginRight: 10 },
   statValue: { fontSize: 20, fontFamily: 'Helvetica-Bold' },
   statLabel: { fontSize: 7, color: MUTED, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 },
 
-  teamHeading: { backgroundColor: DARK, color: LIME, fontSize: 11, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 1, padding: 7, marginTop: 16, marginBottom: 10, borderRadius: 3 },
+  teamHeading: { backgroundColor: DARK, color: ACCENT, fontSize: 11, fontFamily: 'Helvetica-Bold', textTransform: 'uppercase', letterSpacing: 1, padding: 7, marginTop: 16, marginBottom: 10, borderRadius: 3 },
 
   cardGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   card: { width: '48%', border: '1 solid #e2e5df', borderRadius: 6, padding: 10, marginBottom: 10, marginRight: '2%', flexDirection: 'row' },
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: { width: 40, height: 40, borderRadius: 20, marginRight: 8, backgroundColor: '#eef1e8' },
   cardBody: { flex: 1 },
   cardName: { fontSize: 11, fontFamily: 'Helvetica-Bold' },
-  cardIgn: { fontSize: 9, color: '#6b8f00', fontFamily: 'Helvetica-Bold', marginTop: 1 },
+  cardIgn: { fontSize: 9, color: ACCENT, fontFamily: 'Helvetica-Bold', marginTop: 1 },
   cardRow: { flexDirection: 'row', marginTop: 3 },
   cardLabel: { fontSize: 7, color: MUTED, width: 52, textTransform: 'uppercase' },
   cardValue: { fontSize: 8, flex: 1 },

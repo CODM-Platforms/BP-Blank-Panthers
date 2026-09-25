@@ -93,7 +93,7 @@ export default async function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-space-md mt-space-sm">
-            <Link href="/join" className="group py-space-md px-space-xl rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(177,248,0,0.2)] hover:shadow-[0_0_32px_rgba(177,248,0,0.35)]">
+            <Link href="/join" className="group py-space-md px-space-xl rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(255,59,59,0.2)] hover:shadow-[0_0_32px_rgba(255,59,59,0.35)]">
               <span className="material-symbols-outlined text-[20px]">how_to_reg</span>
               <span>Submit Combine Dossier</span>
             </Link>

@@ -318,7 +318,7 @@ export default function TacticalJoinPage() {
                 </div>
 
                 <div className="pt-space-md">
-                  <button type="submit" disabled={isSubmitting} className="group w-full py-space-md px-space-lg rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(177,248,0,0.2)] hover:shadow-[0_0_32px_rgba(177,248,0,0.35)] disabled:opacity-50">
+                  <button type="submit" disabled={isSubmitting} className="group w-full py-space-md px-space-lg rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(255,59,59,0.2)] hover:shadow-[0_0_32px_rgba(255,59,59,0.35)] disabled:opacity-50">
                     <span className="material-symbols-outlined text-[20px]">{isSubmitting ? 'hourglass_empty' : 'how_to_reg'}</span>
                     <span>{isSubmitting ? 'TRANSMITTING...' : 'Submit Combine Dossier'}</span>
                     {!isSubmitting && <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">arrow_forward</span>}

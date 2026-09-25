@@ -25,7 +25,7 @@ export default function GlobalHeader() {
       
       <div className="hidden sm:flex items-center gap-space-sm">
         <Link href="/admin/login" className="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded border border-surface-container-high/60 hover:border-primary-container/50 hover:bg-surface-container-highest transition-colors cursor-pointer group">
-          <div className="w-2 h-2 rounded-full bg-primary-container animate-pulse group-hover:shadow-[0_0_8px_rgba(177,248,0,0.8)]"></div>
+          <div className="w-2 h-2 rounded-full bg-primary-container animate-pulse group-hover:shadow-[0_0_8px_rgba(255,59,59,0.8)]"></div>
           <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider group-hover:text-primary-container transition-colors">SYS: ONLINE</span>
         </Link>
       </div>

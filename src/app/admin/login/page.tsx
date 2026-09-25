@@ -144,7 +144,7 @@ export default function TacticalAdminLogin() {
                     </div>
                   </div>
 
-                  <button type="submit" disabled={isAuthenticating} className="group w-full py-space-md px-space-lg rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(177,248,0,0.2)] hover:shadow-[0_0_32px_rgba(177,248,0,0.35)] disabled:opacity-50">
+                  <button type="submit" disabled={isAuthenticating} className="group w-full py-space-md px-space-lg rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(255,59,59,0.2)] hover:shadow-[0_0_32px_rgba(255,59,59,0.35)] disabled:opacity-50">
                     {isAuthenticating ? (
                       <>
                         <span className="inline-block animate-spin material-symbols-outlined text-[20px]">sync</span>

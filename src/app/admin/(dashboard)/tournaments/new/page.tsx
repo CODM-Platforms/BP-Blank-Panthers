@@ -95,7 +95,7 @@ export default function CreateTournament() {
             <Link href="/admin" className="px-6 py-3 rounded-lg text-outline hover:text-on-surface transition-colors">
               Cancel
             </Link>
-            <button type="submit" className="px-8 py-3 bg-primary-container text-surface-container-lowest rounded-lg font-bold hover:bg-primary-fixed-dim transition-colors shadow-[0_0_15px_rgba(177,248,0,0.3)]">
+            <button type="submit" className="px-8 py-3 bg-primary-container text-surface-container-lowest rounded-lg font-bold hover:bg-primary-fixed-dim transition-colors shadow-[0_0_15px_rgba(255,59,59,0.3)]">
               Create & Publish Tournament
             </button>
           </div>

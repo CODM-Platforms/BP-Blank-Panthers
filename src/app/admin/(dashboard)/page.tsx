@@ -106,7 +106,7 @@ export default async function AdminDashboard() {
               <span className="material-symbols-outlined text-primary-container">sports_esports</span>
               Priority Scrimmage
             </h2>
-            <Link href="/admin/tournaments/new" className="font-label-sm text-label-sm px-space-md py-2 bg-primary-container text-on-primary-container rounded uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors flex items-center gap-1 shadow-[0_0_15px_rgba(177,248,0,0.15)]">
+            <Link href="/admin/tournaments/new" className="font-label-sm text-label-sm px-space-md py-2 bg-primary-container text-on-primary-container rounded uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors flex items-center gap-1 shadow-[0_0_15px_rgba(255,59,59,0.15)]">
               <span className="material-symbols-outlined text-[16px]">add</span> Deploy Op
             </Link>
           </div>
