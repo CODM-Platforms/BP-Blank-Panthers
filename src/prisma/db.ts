@@ -14,11 +14,16 @@ import 'dotenv/config';
 // installed module is near-instant, always well ahead of any actual network
 // round trip to the database, so every real query is safe by the time it
 // needs to decode/encode a timestamp.
-if (!('Temporal' in globalThis)) {
-  import('temporal-polyfill').then(({ Temporal }) => {
-    (globalThis as unknown as { Temporal: typeof Temporal }).Temporal = Temporal;
-  });
-}
+//
+// Importing from 'temporal-polyfill/implementation' (not the plain
+// 'temporal-polyfill' entry) forces the polyfill's own implementation
+// instead of auto-detecting a "native" Temporal - Vercel's runtime exposes
+// something that gets detected as native but crashes inside
+// PlainDateTime.toString(), so this always overwrites globalThis.Temporal
+// unconditionally rather than skipping when something's already there.
+import('temporal-polyfill/implementation').then(({ Temporal }) => {
+  (globalThis as unknown as { Temporal: typeof Temporal }).Temporal = Temporal;
+});
 import postgres from '@prisma/orm-postgres/runtime';
 import type { Contract } from './contract.d';
 import contractJson from './contract.json' with { type: 'json' };
