@@ -60,7 +60,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
         </div>
         <div className="flex gap-3">
           <a href={`/api/admin/tournaments/${tournament.id}/export`} className="px-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-on-surface hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
-            <Download className="w-4 h-4" /> Export Confirmed
+            <Download className="w-4 h-4" /> Export Roster (PDF)
           </a>
           <Link href={`/admin/tournaments/${tournament.id}/teams`} className="px-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-on-surface hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
             <Users className="w-4 h-4" /> Team Builder

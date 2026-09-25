@@ -1,12 +1,15 @@
 import { db } from '@/prisma/db';
 import { getSessionUser } from '@/lib/session';
+import { getBaseUrl } from '@/lib/url';
+import { toJsDate } from '@/lib/temporal';
 import { NextRequest, NextResponse } from 'next/server';
+import { renderToBuffer } from '@react-pdf/renderer';
+import TournamentRosterPdf from '@/components/pdf/TournamentRosterPdf';
 
-function csvEscape(value: string): string {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
+function resolveImageUrl(path: string | null, baseUrl: string): string | null {
+  if (!path) return null;
+  if (path.startsWith('data:') || path.startsWith('http')) return path;
+  return `${baseUrl}${path}`;
 }
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -20,6 +23,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ error: 'Tournament not found' }, { status: 404 });
   }
 
+  const clan = await db.orm.public.Clan.first();
+
   const participants = await db.orm.public.Participant
     .where({ tournamentId: params.id })
     .where((p) => p.attendanceStatus.eq('CONFIRMED'))
@@ -27,41 +32,38 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     .include('team', (t) => t)
     .all();
 
-  const header = [
-    'Full Name',
-    'Player ID',
-    'CODM IGN',
-    'UID',
-    'Device',
-    'Device Serial',
-    'Phone/WhatsApp',
-    'Country',
-    'Region',
-    'Preferred Mode',
-    'Status',
-    'Team',
-  ];
-  const rows = participants.map((p: any) => [
-    p.member.fullName,
-    p.member.playerId,
-    p.member.codmUsername,
-    p.member.codmUid,
-    p.member.deviceModel,
-    p.member.deviceSerial,
-    p.member.whatsappNumber,
-    p.member.country,
-    p.member.region,
-    p.member.preferredMode,
-    p.member.status,
-    p.team?.name ?? '',
-  ]);
+  const baseUrl = getBaseUrl();
 
-  const csv = [header, ...rows].map((row) => row.map((v) => csvEscape(String(v))).join(',')).join('\n');
+  const pdfBuffer = await renderToBuffer(
+    TournamentRosterPdf({
+      clanName: clan?.name ?? 'Clan',
+      clanTag: clan?.tag ?? '',
+      logoUrl: resolveImageUrl(clan?.logo ?? '/logo/BP-BlackPanthers.jpeg', baseUrl),
+      tournamentName: tournament.name,
+      tournamentDate: toJsDate(tournament.tournamentDate).toLocaleDateString(),
+      tournamentMode: tournament.mode,
+      generatedAt: new Date().toLocaleString(),
+      participants: participants.map((p: any) => ({
+        team: p.team ? { name: p.team.name } : null,
+        member: {
+          fullName: p.member.fullName,
+          codmUsername: p.member.codmUsername,
+          playerId: p.member.playerId,
+          codmUid: p.member.codmUid,
+          deviceModel: p.member.deviceModel,
+          whatsappNumber: p.member.whatsappNumber,
+          country: p.member.country,
+          region: p.member.region,
+          profilePicture: resolveImageUrl(p.member.profilePicture, baseUrl),
+        },
+      })),
+    })
+  );
 
-  return new NextResponse(csv, {
+  return new NextResponse(new Uint8Array(pdfBuffer), {
     headers: {
-      'Content-Type': 'text/csv',
-      'Content-Disposition': `attachment; filename="${tournament.name.replace(/[^a-z0-9]/gi, '_')}_confirmed.csv"`,
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${tournament.name.replace(/[^a-z0-9]/gi, '_')}_roster.pdf"`,
     },
   });
 }
