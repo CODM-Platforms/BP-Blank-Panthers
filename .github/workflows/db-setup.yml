@@ -40,7 +40,13 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm ci
+      # npm ci requires exact lockfile sync, which keeps drifting because
+      # @prisma/composer (pulled in transitively by the prisma CLI's own
+      # toolchain, not by our app) depends on fast-moving prerelease
+      # packages (effect, alchemy) that can resolve slightly differently
+      # across npm/Node versions even from an identical lockfile. npm
+      # install tolerates that instead of hard-failing on it.
+      - run: npm install
 
       - name: Apply pending migrations
         run: npx prisma db migrate
