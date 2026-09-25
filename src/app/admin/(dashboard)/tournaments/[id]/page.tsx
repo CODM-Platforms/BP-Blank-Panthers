@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
 import { toJsDate, sanitizeForClient } from '@/lib/temporal';
+import { getBaseUrl } from '@/lib/url';
 import { publishTournament, cancelTournament, inviteMembersToTournament } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 
@@ -155,6 +156,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
         participants={sanitizeForClient(participants)}
         tournamentName={tournament.name}
         tournamentDate={tournamentDateStr}
+        appUrl={getBaseUrl()}
       />
     </div>
   );

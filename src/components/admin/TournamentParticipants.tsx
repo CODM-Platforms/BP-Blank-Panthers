@@ -17,9 +17,10 @@ interface Props {
   participants: any[];
   tournamentName: string;
   tournamentDate: string;
+  appUrl: string;
 }
 
-export default function TournamentParticipants({ participants, tournamentName, tournamentDate }: Props) {
+export default function TournamentParticipants({ participants, tournamentName, tournamentDate, appUrl }: Props) {
   const counts: Record<TabKey, number> = {
     PENDING: 0, CONFIRMED: 0, DECLINED: 0, ATTENDED: 0, NO_SHOW: 0,
   };
@@ -29,8 +30,6 @@ export default function TournamentParticipants({ participants, tournamentName, t
 
   const [tab, setTab] = useState<TabKey>('PENDING');
   const shown = participants.filter((p) => p.attendanceStatus === tab);
-
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? '';
 
   return (
     <div className="bg-surface-container-low border border-surface-container-high rounded-xl overflow-hidden">
