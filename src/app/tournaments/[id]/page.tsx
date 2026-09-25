@@ -11,6 +11,7 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
       .where({ id: params.id })
       .include('participants', (p) => p.where((pp) => pp.attendanceStatus.in(['CONFIRMED', 'ATTENDED'])).include('member', (m) => m).include('team', (t) => t))
       .include('teams', (t) => t.orderBy((tm) => tm.placement.asc()))
+      .include('photos', (p) => p.orderBy((ph) => ph.createdAt.desc()))
       .first();
   } catch (e) {
     console.error('DB error', e);
@@ -108,6 +109,24 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
                   </div>
                 ))
               )}
+            </div>
+          )}
+
+          {tournament.photos.length > 0 && (
+            <div className="flex flex-col gap-space-md mt-space-lg">
+              <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary-container">photo_camera</span> Result Photos
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-space-sm">
+                {tournament.photos.map((photo: any) => (
+                  <div key={photo.id} className="bg-surface-container-low/80 border border-surface-container-high rounded-xl overflow-hidden">
+                    <img src={photo.imageUrl} alt={photo.caption ?? tournament.name} className="w-full aspect-square object-cover" />
+                    {photo.caption && (
+                      <p className="text-xs text-outline px-space-sm py-2 truncate">{photo.caption}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

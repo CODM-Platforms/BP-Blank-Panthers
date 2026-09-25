@@ -149,6 +149,22 @@ model Tournament {
 
   participants Participant[]
   teams        Team[]
+  photos       TournamentPhoto[]
+}
+
+// Result screenshots (final scoreboard, MVP screen, etc.) an admin attaches
+// to a tournament so the public site can show proof of the outcome, not
+// just the placement/points numbers.
+model TournamentPhoto {
+  id           String     @id @default(cuid())
+
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+
+  imageUrl     String     @db.Text
+  caption      String?
+
+  createdAt    DateTime   @default(now())
 }
 
 enum AttendanceStatus {

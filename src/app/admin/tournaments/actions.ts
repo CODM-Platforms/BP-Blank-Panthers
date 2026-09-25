@@ -168,6 +168,41 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
   redirect(`/admin/tournaments/${tournamentId}`);
 }
 
+export async function addTournamentPhoto(tournamentId: string, formData: FormData) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const imageUrl = formData.get('imageUrl') as string;
+  const caption = (formData.get('caption') as string) || null;
+
+  if (!imageUrl) {
+    throw new Error('No image provided.');
+  }
+
+  await db.orm.public.TournamentPhoto.create({
+    tournamentId,
+    imageUrl,
+    caption,
+  });
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
+export async function deleteTournamentPhoto(photoId: string, tournamentId: string) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  await db.orm.public.TournamentPhoto.where({ id: photoId }).delete();
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
 export async function cancelTournament(tournamentId: string) {
   const actor = await getSessionUser();
   if (!actor) {

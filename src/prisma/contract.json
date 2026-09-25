@@ -32,6 +32,10 @@
       "model": "Tournament",
       "namespace": "public"
     },
+    "TournamentPhoto": {
+      "model": "TournamentPhoto",
+      "namespace": "public"
+    },
     "User": {
       "model": "User",
       "namespace": "public"
@@ -1195,6 +1199,21 @@
                   "namespace": "public"
                 }
               },
+              "photos": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "tournamentId"
+                  ]
+                },
+                "to": {
+                  "model": "TournamentPhoto",
+                  "namespace": "public"
+                }
+              },
               "teams": {
                 "cardinality": "1:N",
                 "on": {
@@ -1255,6 +1274,87 @@
               },
               "namespaceId": "public",
               "table": "Tournament"
+            }
+          },
+          "TournamentPhoto": {
+            "fields": {
+              "caption": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "imageUrl": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "tournamentId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "tournament": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "tournamentId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Tournament",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "caption": {
+                  "column": "caption"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "imageUrl": {
+                  "column": "imageUrl"
+                },
+                "tournamentId": {
+                  "column": "tournamentId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "TournamentPhoto"
             }
           },
           "User": {
@@ -2395,6 +2495,69 @@
               },
               "uniques": []
             },
+            "TournamentPhoto": {
+              "columns": {
+                "caption": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamp-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "imageUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "tournamentId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "tournamentId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "TournamentPhoto"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Tournament"
+                  }
+                }
+              ],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "User": {
               "columns": {
                 "clanId": {
@@ -2602,10 +2765,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "8068f7ca293d976d213a9cd81ba8266e8d61ba13fbe753bb630f6c34c74541f5"
+    "storageHash": "4ed56cdd12e86a41742c3476c0d9426d891d9485976da8c6d06eb8f73fa4e753"
   },
   "execution": {
-    "executionHash": "eb4f07737e6bf02eb6fb4c42b4d2bd83538f71ffad9609ae0a2554eb0a1db1d1",
+    "executionHash": "89a20b8aea7a7a1a83e9af714c3cc81e79b2ede71ec9a792f92e52630a14d80f",
     "mutations": {
       "defaults": [
         {
@@ -2773,6 +2936,17 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "Tournament"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "cuid2",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "TournamentPhoto"
           }
         },
         {

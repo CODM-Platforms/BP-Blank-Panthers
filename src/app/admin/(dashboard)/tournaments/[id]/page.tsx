@@ -6,6 +6,7 @@ import { toJsDate, sanitizeForClient } from '@/lib/temporal';
 import { getBaseUrl } from '@/lib/url';
 import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
+import TournamentPhotos from '@/components/admin/TournamentPhotos';
 
 export default async function TournamentControlCenter({ params }: { params: { id: string } }) {
   let tournament = null;
@@ -15,6 +16,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
       .where({ id: params.id })
       .include('participants', (p) => p.include('member', (m) => m).include('team', (t) => t))
       .include('teams', (t) => t)
+      .include('photos', (p) => p.orderBy((ph) => ph.createdAt.desc()))
       .first();
 
     if (tournament) {
@@ -179,6 +181,9 @@ export default async function TournamentControlCenter({ params }: { params: { id
           </button>
         </form>
       )}
+
+      {/* Result Photos */}
+      <TournamentPhotos tournamentId={tournament.id} photos={sanitizeForClient(tournament.photos)} />
 
       {/* Participants Table */}
       <TournamentParticipants
