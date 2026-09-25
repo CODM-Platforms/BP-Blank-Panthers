@@ -9,7 +9,7 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
   try {
     tournament = await db.orm.public.Tournament
       .where({ id: params.id })
-      .include('participants', (p) => p.where((pp) => pp.attendanceStatus.eq('CONFIRMED')).include('member', (m) => m).include('team', (t) => t))
+      .include('participants', (p) => p.where((pp) => pp.attendanceStatus.in(['CONFIRMED', 'ATTENDED'])).include('member', (m) => m).include('team', (t) => t))
       .include('teams', (t) => t.orderBy((tm) => tm.placement.asc()))
       .first();
   } catch (e) {
@@ -21,8 +21,13 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
   }
 
   const isCompleted = tournament.status === 'COMPLETED';
+  // Completed events show who actually showed up; upcoming/ongoing ones
+  // show who's confirmed to show up - two different questions.
+  const rosterParticipants = tournament.participants.filter((p: any) =>
+    isCompleted ? p.attendanceStatus === 'ATTENDED' : p.attendanceStatus === 'CONFIRMED'
+  );
   const teamGroups = new Map<string, any[]>();
-  for (const p of tournament.participants) {
+  for (const p of rosterParticipants) {
     const key = p.team?.name ?? 'Unassigned';
     if (!teamGroups.has(key)) teamGroups.set(key, []);
     teamGroups.get(key)!.push(p);
@@ -85,7 +90,7 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
           ) : (
             <div className="flex flex-col gap-space-md">
               <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary-container">groups</span> Confirmed Roster ({tournament.participants.length})
+                <span className="material-symbols-outlined text-primary-container">groups</span> Confirmed Roster ({rosterParticipants.length})
               </h2>
               {teamGroups.size === 0 ? (
                 <p className="text-outline text-sm">No confirmations yet.</p>

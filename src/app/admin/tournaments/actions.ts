@@ -110,6 +110,64 @@ export async function inviteMembersToTournament(tournamentId: string, formData: 
   redirect(`/admin/tournaments/${tournamentId}`);
 }
 
+export async function markAttendance(participantId: string, status: 'ATTENDED' | 'NO_SHOW') {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const participant = await db.orm.public.Participant.first({ id: participantId });
+  if (!participant) {
+    throw new Error('Participant not found');
+  }
+
+  await db.orm.public.Participant.where({ id: participantId }).update({ attendanceStatus: status });
+
+  const member = await db.orm.public.Member.first({ id: participant.memberId });
+  if (member) {
+    await db.orm.public.Member.where({ id: member.id }).update(
+      status === 'ATTENDED'
+        ? { tournamentsAttended: member.tournamentsAttended + 1 }
+        : { tournamentsMissed: member.tournamentsMissed + 1 }
+    );
+  }
+
+  revalidatePath(`/admin/tournaments/${participant.tournamentId}`);
+  revalidatePath(`/tournaments/${participant.tournamentId}`);
+}
+
+export async function saveResultsAndComplete(tournamentId: string, formData: FormData) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const teams = await db.orm.public.Team.where({ tournamentId }).all();
+  for (const team of teams) {
+    const placementRaw = formData.get(`placement_${team.id}`) as string;
+    const pointsRaw = formData.get(`points_${team.id}`) as string;
+    const placement = placementRaw ? Number(placementRaw) : null;
+    const totalPoints = pointsRaw ? Number(pointsRaw) : 0;
+
+    await db.orm.public.Team.where({ id: team.id }).update({ placement, totalPoints });
+  }
+
+  await db.orm.public.Tournament.where({ id: tournamentId }).update({ status: 'COMPLETED' });
+
+  await db.orm.public.AuditLog.create({
+    action: 'TOURNAMENT_RESULTS_SAVED',
+    details: `Results saved and tournament ${tournamentId} marked completed by ${actor.name} (${actor.id}).`,
+    userId: actor.id,
+  });
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/tournaments');
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath('/tournaments');
+  revalidatePath(`/tournaments/${tournamentId}`);
+  redirect(`/admin/tournaments/${tournamentId}`);
+}
+
 export async function cancelTournament(tournamentId: string) {
   const actor = await getSessionUser();
   if (!actor) {

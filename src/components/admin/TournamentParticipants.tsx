@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { markAttendance } from '@/app/admin/tournaments/actions';
 
 type TabKey = 'PENDING' | 'CONFIRMED' | 'DECLINED' | 'ATTENDED' | 'NO_SHOW';
 
@@ -21,6 +23,9 @@ interface Props {
 }
 
 export default function TournamentParticipants({ participants, tournamentName, tournamentDate, appUrl }: Props) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const counts: Record<TabKey, number> = {
     PENDING: 0, CONFIRMED: 0, DECLINED: 0, ATTENDED: 0, NO_SHOW: 0,
   };
@@ -30,6 +35,13 @@ export default function TournamentParticipants({ participants, tournamentName, t
 
   const [tab, setTab] = useState<TabKey>('PENDING');
   const shown = participants.filter((p) => p.attendanceStatus === tab);
+
+  const handleAttendance = (participantId: string, status: 'ATTENDED' | 'NO_SHOW') => {
+    startTransition(async () => {
+      await markAttendance(participantId, status);
+      router.refresh();
+    });
+  };
 
   return (
     <div className="bg-surface-container-low border border-surface-container-high rounded-xl overflow-hidden">
@@ -59,7 +71,7 @@ export default function TournamentParticipants({ participants, tournamentName, t
                 <th className="pb-3 font-medium">Player</th>
                 <th className="pb-3 font-medium">UID</th>
                 <th className="pb-3 font-medium">Squad</th>
-                {tab === 'PENDING' && <th className="pb-3 font-medium text-right">Action</th>}
+                {(tab === 'PENDING' || tab === 'CONFIRMED') && <th className="pb-3 font-medium text-right">Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -81,6 +93,26 @@ export default function TournamentParticipants({ participants, tournamentName, t
                       >
                         <span className="material-symbols-outlined text-[16px]">chat</span> Send Invite
                       </a>
+                    </td>
+                  )}
+                  {tab === 'CONFIRMED' && (
+                    <td className="py-4 text-right">
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          disabled={isPending}
+                          onClick={() => handleAttendance(p.id, 'ATTENDED')}
+                          className="px-3 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded text-sm hover:bg-green-500/20 transition-colors disabled:opacity-50"
+                        >
+                          Attended
+                        </button>
+                        <button
+                          disabled={isPending}
+                          onClick={() => handleAttendance(p.id, 'NO_SHOW')}
+                          className="px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded text-sm hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                        >
+                          No-Show
+                        </button>
+                      </div>
                     </td>
                   )}
                 </tr>

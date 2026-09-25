@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
 import { toJsDate, sanitizeForClient } from '@/lib/temporal';
 import { getBaseUrl } from '@/lib/url';
-import { publishTournament, cancelTournament, inviteMembersToTournament } from '@/app/admin/tournaments/actions';
+import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 
 export default async function TournamentControlCenter({ params }: { params: { id: string } }) {
@@ -40,6 +40,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
   const doPublish = publishTournament.bind(null, tournament.id);
   const doCancel = cancelTournament.bind(null, tournament.id);
   const doInvite = inviteMembersToTournament.bind(null, tournament.id);
+  const doSaveResults = saveResultsAndComplete.bind(null, tournament.id);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -147,6 +148,34 @@ export default async function TournamentControlCenter({ params }: { params: { id
           </div>
           <button type="submit" className="px-6 py-2 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">
             Invite Selected
+          </button>
+        </form>
+      )}
+
+      {/* Enter Results */}
+      {tournament.teams.length > 0 && tournament.status !== 'COMPLETED' && tournament.status !== 'CANCELLED' && (
+        <form action={doSaveResults} className="bg-surface-container-low border border-surface-container-high rounded-xl p-6">
+          <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary-container">emoji_events</span> Enter Results
+          </h2>
+          <p className="text-sm text-outline mb-4">Set final placement and points for each squad, then save to mark this tournament Completed. This is what shows on the public results page.</p>
+          <div className="space-y-3 mb-4">
+            {tournament.teams.map((team: any) => (
+              <div key={team.id} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center bg-surface-container-lowest border border-surface-container-high rounded-lg p-3">
+                <span className="text-on-surface font-bold truncate">{team.name}</span>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-outline uppercase shrink-0">Placement</label>
+                  <input type="number" name={`placement_${team.id}`} min={1} defaultValue={team.placement ?? ''} placeholder="1st, 2nd..." className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm focus:outline-none focus:border-primary-container" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-outline uppercase shrink-0">Points</label>
+                  <input type="number" name={`points_${team.id}`} min={0} defaultValue={team.totalPoints ?? 0} className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm focus:outline-none focus:border-primary-container" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <button type="submit" className="px-6 py-2 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">
+            Save Results &amp; Mark Completed
           </button>
         </form>
       )}
