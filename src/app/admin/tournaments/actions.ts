@@ -33,17 +33,24 @@ export async function createTournament(formData: FormData) {
     throw new Error('End Time must be after Start Time.');
   }
 
-  const tournament = await db.orm.public.Tournament.create({
-    clanId: clan.id,
-    name,
-    mode: mode as 'BR' | 'MP' | 'CUSTOM',
-    teamSize,
-    maxPlayers,
-    tournamentDate: toTemporalDateTime(tournamentDate),
-    tournamentEnd: toTemporalDateTime(tournamentEnd),
-    registrationEnd: toTemporalDateTime(registrationEnd),
-    status: 'PUBLISHED',
-  });
+  let tournament;
+  try {
+    tournament = await db.orm.public.Tournament.create({
+      clanId: clan.id,
+      name,
+      mode: mode as 'BR' | 'MP' | 'CUSTOM',
+      teamSize,
+      maxPlayers,
+      tournamentDate: toTemporalDateTime(tournamentDate),
+      tournamentEnd: toTemporalDateTime(tournamentEnd),
+      registrationEnd: toTemporalDateTime(registrationEnd),
+      status: 'PUBLISHED',
+    });
+  } catch (e) {
+    console.error('Tournament creation failed', e);
+    const detail = e instanceof Error ? e.message : String(e);
+    throw new Error(`Failed to create tournament: ${detail}`);
+  }
 
   await db.orm.public.AuditLog.create({
     action: 'TOURNAMENT_CREATED',
