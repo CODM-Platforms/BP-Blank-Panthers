@@ -1,8 +1,11 @@
 
 import Link from 'next/link';
-import { db } from '@/prisma/db';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import { getSessionUser } from '@/lib/session';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const actor = await getSessionUser();
+
   return (
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col md:flex-row font-sans selection:bg-primary-container selection:text-on-primary-container relative overflow-hidden">
       
@@ -28,44 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         
         {/* Navigation */}
-        <nav className="flex-1 px-space-md py-space-lg flex flex-col gap-space-xs">
-          <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono text-[9px] mb-2 px-space-sm">Main Systems</span>
-          
-          <Link href="/admin" className="flex items-center px-space-md py-space-sm rounded-lg bg-primary-container/10 text-primary-container border border-primary-container/20 hover:bg-primary-container/20 transition-colors">
-            <span className="material-symbols-outlined text-[20px] mr-3">dashboard</span>
-            <span className="font-label-sm tracking-widest uppercase text-sm">Dashboard</span>
-          </Link>
-          
-          <Link href="/admin/members" className="flex items-center px-space-md py-space-sm rounded-lg text-outline hover:bg-surface-container hover:text-on-surface border border-transparent transition-colors">
-            <span className="material-symbols-outlined text-[20px] mr-3">group</span>
-            <span className="font-label-sm tracking-widest uppercase text-sm">Operators</span>
-          </Link>
-          
-          <Link href="/admin/tournaments" className="flex items-center px-space-md py-space-sm rounded-lg text-outline hover:bg-surface-container hover:text-on-surface border border-transparent transition-colors">
-            <span className="material-symbols-outlined text-[20px] mr-3">sports_esports</span>
-            <span className="font-label-sm tracking-widest uppercase text-sm">Tournaments</span>
-          </Link>
-          
-          <Link href="/admin/content" className="flex items-center px-space-md py-space-sm rounded-lg text-outline hover:bg-surface-container hover:text-on-surface border border-transparent transition-colors">
-            <span className="material-symbols-outlined text-[20px] mr-3">article</span>
-            <span className="font-label-sm tracking-widest uppercase text-sm">Intel / News</span>
-          </Link>
-
-          <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono text-[9px] mt-6 mb-2 px-space-sm">Configuration</span>
-
-          <Link href="/admin/settings" className="flex items-center px-space-md py-space-sm rounded-lg text-outline hover:bg-surface-container hover:text-on-surface border border-transparent transition-colors">
-            <span className="material-symbols-outlined text-[20px] mr-3">settings</span>
-            <span className="font-label-sm tracking-widest uppercase text-sm">System Prefs</span>
-          </Link>
-
-          <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono text-[9px] mt-6 mb-2 px-space-sm">External Access</span>
-
-          <Link href="/" target="_blank" className="flex items-center px-space-md py-space-sm rounded-lg text-outline hover:bg-surface-container hover:text-on-surface border border-transparent transition-colors">
-            <span className="material-symbols-outlined text-[20px] mr-3">public</span>
-            <span className="font-label-sm tracking-widest uppercase text-sm">Public Terminal</span>
-          </Link>
-
-        </nav>
+        <AdminSidebar />
 
         {/* Footer */}
         <div className="p-space-md border-t border-surface-container-high/50">
@@ -102,11 +68,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="h-10 w-px bg-surface-container-high"></div>
             <div className="flex items-center gap-space-sm">
               <div className="flex flex-col text-right hidden sm:flex">
-                <span className="font-label-sm text-label-sm text-on-surface uppercase tracking-widest">Admin</span>
-                <span className="font-mono text-[9px] text-outline tracking-widest">CLAN MASTER</span>
+                <span className="font-label-sm text-label-sm text-on-surface uppercase tracking-widest">{actor?.name ?? 'Unknown'}</span>
+                <span className="font-mono text-[9px] text-outline tracking-widest">{actor?.role.replace('_', ' ') ?? ''}</span>
               </div>
               <div className="w-10 h-10 rounded-full border border-primary-container/50 bg-surface-container overflow-hidden flex items-center justify-center">
-                <span className="material-symbols-outlined text-outline">person</span>
+                {actor?.member?.profilePicture ? (
+                  <img src={actor.member.profilePicture} alt={actor.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-outline">person</span>
+                )}
               </div>
             </div>
           </div>

@@ -38,11 +38,11 @@ export default async function ManualTeamBuilder({ params }: { params: { id: stri
           <p className="text-panther-text mt-1">{tournament?.name || 'Tournament'} - Construct squads manually.</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 border border-panther-border text-panther-text hover:text-white rounded-lg transition-colors">
+          <button disabled title="Not built yet" className="px-4 py-2 border border-panther-border text-panther-text/40 rounded-lg cursor-not-allowed">
             Auto-Generate Rest
           </button>
-          <button className="px-4 py-2 bg-panther-gold text-panther-dark font-bold rounded-lg hover:bg-panther-gold-hover transition-colors shadow-[0_0_15px_rgba(230,200,117,0.3)]">
-            Save Teams & Notify
+          <button disabled title="Not built yet - drag-and-drop team assignment is on the roadmap" className="px-4 py-2 bg-panther-gold/30 text-panther-dark/50 font-bold rounded-lg cursor-not-allowed">
+            Save Teams
           </button>
         </div>
       </div>

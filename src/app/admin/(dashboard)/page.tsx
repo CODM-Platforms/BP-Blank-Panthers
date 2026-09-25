@@ -139,11 +139,8 @@ export default async function AdminDashboard() {
 
                 <div className="flex gap-space-md mt-auto">
                   <Link href={`/admin/tournaments/${upcomingTournament.id}`} className="flex-1 text-center py-3 bg-surface-container-highest border border-surface-container-high rounded-lg text-outline hover:text-on-surface hover:border-primary-container/30 transition-colors font-label-sm uppercase tracking-widest flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">terminal</span> Override Parameters
+                    <span className="material-symbols-outlined text-[18px]">terminal</span> Manage Tournament
                   </Link>
-                  <button className="flex-1 text-center py-3 bg-surface-container-highest border border-surface-container-high rounded-lg text-outline hover:text-on-surface hover:border-primary-container/30 transition-colors font-label-sm uppercase tracking-widest flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">campaign</span> Broadcast Intel
-                  </button>
                 </div>
               </>
             ) : (
