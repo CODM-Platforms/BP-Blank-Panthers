@@ -23,7 +23,6 @@ export async function submitDossier(formData: FormData) {
       fullName: formData.get('fullName') as string,
       codmUsername: withClanTag(handle),
       codmUid: formData.get('codmUid') as string,
-      playerId: formData.get('playerId') as string,
       whatsappNumber: `${countryCode}${whatsapp}`,
       deviceModel: formData.get('deviceModel') as string,
       deviceSerial: formData.get('deviceSerial') as string,

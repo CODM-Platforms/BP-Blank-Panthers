@@ -9,10 +9,9 @@ interface SeedMemberProfile {
   fullName: string;
   codmUsername: string;
   codmUid: string;
-  playerId: string;
   whatsappNumber: string; // include country code, e.g. +2547XXXXXXXX
   deviceModel: string;
-  deviceSerial: string; // last 4 digits only
+  deviceSerial: string; // last 6 characters, letters and digits
   country: string;
   region: string;
   preferredMode: PreferredMode;
@@ -32,8 +31,6 @@ interface SeedAdmin {
   member?: SeedMemberProfile;
 }
 
-// The lead clan master's identity is the one shown on every member approval,
-// regardless of which clan master actually clicks approve.
 const admins: SeedAdmin[] = [
   {
     name: 'Luqman Hamza',
@@ -45,7 +42,6 @@ const admins: SeedAdmin[] = [
       fullName: 'Luqman Hamza',
       codmUsername: 'ẞP.ঐ-4:0:4-',
       codmUid: '6984334395914518530',
-      playerId: '404',
       whatsappNumber: '+255612901039',
       deviceModel: 'Plus10T',
       deviceSerial: '546efa24',
@@ -65,7 +61,6 @@ const admins: SeedAdmin[] = [
       fullName: 'Khalifa',
       codmUsername: 'ẞP.ঐGUITZY',
       codmUid: '7326055061910388737',
-      playerId: 'GUITZY',
       whatsappNumber: '+255711634255',
       deviceModel: 'Samsung Note 20 Ultra',
       deviceSerial: '0D29XD',
@@ -88,7 +83,6 @@ const admins: SeedAdmin[] = [
       fullName: 'Crady',
       codmUsername: 'ẞP.ঐCRADY',
       codmUid: 'PENDING-CRADY-UID',
-      playerId: 'CRADY',
       whatsappNumber: 'PENDING-CRADY-WHATSAPP',
       deviceModel: 'Pending',
       deviceSerial: 'PEND',
@@ -112,7 +106,6 @@ const admins: SeedAdmin[] = [
       fullName: 'Lenxon',
       codmUsername: 'ẞP.ঐLENXON',
       codmUid: 'PENDING-LENXON-UID',
-      playerId: 'LENXON',
       whatsappNumber: 'PENDING-LENXON-WHATSAPP',
       deviceModel: 'Pending',
       deviceSerial: 'PEND',
@@ -160,7 +153,6 @@ async function main() {
           fullName: m.fullName,
           codmUsername: m.codmUsername,
           codmUid: m.codmUid,
-          playerId: m.playerId,
           whatsappNumber: m.whatsappNumber,
           deviceModel: m.deviceModel,
           deviceSerial: m.deviceSerial,
@@ -177,7 +169,6 @@ async function main() {
         await db.orm.public.Member.where({ id: existingMember.id }).update({
           fullName: m.fullName,
           codmUid: m.codmUid,
-          playerId: m.playerId,
           whatsappNumber: m.whatsappNumber,
           deviceModel: m.deviceModel,
           deviceSerial: m.deviceSerial,

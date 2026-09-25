@@ -73,7 +73,6 @@ export default async function MemberDetail({ params }: { params: { id: string } 
       </div>
 
       <div className="bg-surface-container-low border border-surface-container-high rounded-xl p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-        <div><span className="text-outline">Player ID</span><p className="text-on-surface font-mono">{member.playerId}</p></div>
         <div><span className="text-outline">CODM UID</span><p className="text-on-surface font-mono">{member.codmUid}</p></div>
         <div><span className="text-outline">WhatsApp</span><p className="text-on-surface font-mono">{member.whatsappNumber}</p></div>
         <div><span className="text-outline">Device</span><p className="text-on-surface">{member.deviceModel}</p></div>

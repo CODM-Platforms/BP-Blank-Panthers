@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'88278bf13a339a3d736466447deae33fc5dfc4866fd95e4eb11245fba30937fa'>;
+  StorageHashBase<'8068f7ca293d976d213a9cd81ba8266e8d61ba13fbe753bb630f6c34c74541f5'>;
 export type ExecutionHash =
   ExecutionHashBase<'eb4f07737e6bf02eb6fb4c42b4d2bd83538f71ffad9609ae0a2554eb0a1db1d1'>;
 export type ProfileHash =
@@ -279,7 +279,6 @@ export type FieldOutputTypes = {
       readonly deviceSerial: CodecTypes['pg/text@1']['output'];
       readonly fullName: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
-      readonly playerId: CodecTypes['pg/text@1']['output'];
       readonly preferredMode: CodecTypes['pg/text@1']['output'];
       readonly profilePicture: CodecTypes['pg/text@1']['output'] | null;
       readonly region: CodecTypes['pg/text@1']['output'];
@@ -388,7 +387,6 @@ export type FieldInputTypes = {
       readonly deviceSerial: CodecTypes['pg/text@1']['input'];
       readonly fullName: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
-      readonly playerId: CodecTypes['pg/text@1']['input'];
       readonly preferredMode: CodecTypes['pg/text@1']['input'];
       readonly profilePicture: CodecTypes['pg/text@1']['input'] | null;
       readonly region: CodecTypes['pg/text@1']['input'];
@@ -497,7 +495,6 @@ export type StorageColumnTypes = {
       readonly deviceSerial: CodecTypes['pg/text@1']['output'];
       readonly fullName: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
-      readonly playerId: CodecTypes['pg/text@1']['output'];
       readonly preferredMode: CodecTypes['pg/text@1']['output'];
       readonly profilePicture: CodecTypes['pg/text@1']['output'] | null;
       readonly region: CodecTypes['pg/text@1']['output'];
@@ -606,7 +603,6 @@ export type StorageColumnInputTypes = {
       readonly deviceSerial: CodecTypes['pg/text@1']['input'];
       readonly fullName: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
-      readonly playerId: CodecTypes['pg/text@1']['input'];
       readonly preferredMode: CodecTypes['pg/text@1']['input'];
       readonly profilePicture: CodecTypes['pg/text@1']['input'] | null;
       readonly region: CodecTypes['pg/text@1']['input'];
@@ -722,7 +718,6 @@ export namespace Models {
     deviceSerial: CodecTypes['pg/text@1']['output'];
     fullName: CodecTypes['pg/text@1']['output'];
     id: CodecTypes['pg/text@1']['output'];
-    playerId: CodecTypes['pg/text@1']['output'];
     preferredMode: CodecTypes['pg/text@1']['output'];
     profilePicture: CodecTypes['pg/text@1']['output'] | null;
     region: CodecTypes['pg/text@1']['output'];
@@ -1013,11 +1008,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
-                readonly playerId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
                 readonly preferredMode: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -1102,11 +1092,6 @@ type ContractBase = Omit<
                 {
                   readonly name: 'Member_codmUsername_key';
                   readonly columns: readonly ['codmUsername'];
-                  readonly unique: true;
-                },
-                {
-                  readonly name: 'Member_playerId_key';
-                  readonly columns: readonly ['playerId'];
                   readonly unique: true;
                 },
                 {
@@ -1885,10 +1870,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly playerId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
               readonly preferredMode: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -2005,7 +1986,6 @@ type ContractBase = Omit<
                 readonly deviceSerial: { readonly column: 'deviceSerial' };
                 readonly fullName: { readonly column: 'fullName' };
                 readonly id: { readonly column: 'id' };
-                readonly playerId: { readonly column: 'playerId' };
                 readonly preferredMode: { readonly column: 'preferredMode' };
                 readonly profilePicture: { readonly column: 'profilePicture' };
                 readonly region: { readonly column: 'region' };

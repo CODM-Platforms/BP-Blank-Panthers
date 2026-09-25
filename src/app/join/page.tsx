@@ -230,17 +230,6 @@ export default function TacticalJoinPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-space-xs">
-                    <label className="font-label-sm text-label-sm tracking-widest uppercase text-on-surface-variant flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[13px] text-primary-container">qr_code</span>
-                      Player ID
-                    </label>
-                    <div className="relative flex items-center">
-                      <input name="playerId" type="text" required placeholder="e.g. PILATO" className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md pl-10 focus:outline-none focus:bg-surface-container transition-all tracking-widest font-mono" />
-                      <span className="material-symbols-outlined text-[18px] text-outline absolute left-3 pointer-events-none">numbers</span>
-                    </div>
-                  </div>
-
                 </div>
 
                 <div className="flex items-center gap-space-sm my-space-xs">

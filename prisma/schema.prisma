@@ -81,10 +81,9 @@ model Member {
   fullName        String
   codmUsername    String       @unique
   codmUid         String       @unique
-  playerId        String       @unique
   whatsappNumber  String       @unique
   deviceModel     String
-  deviceSerial    String       // Store only last 4 digits
+  deviceSerial    String       // Last 6 characters of the device serial (letters and digits)
   country         String
   region          String
   preferredMode   String       // BR, MP, Both
@@ -101,9 +100,7 @@ model Member {
   suspensionEnd        DateTime?
   adminNotes           String?   @db.Text
 
-  // The approver shown for this member's approval. Always set to the
-  // designated lead clan master (User.isLead), never to the account that
-  // actually clicked approve - see AuditLog for the real actor.
+  // The admin who actually approved this member (shown as-is on their profile).
   approvedById         String?
   approvedBy           User?     @relation("MemberApprovedBy", fields: [approvedById], references: [id])
 

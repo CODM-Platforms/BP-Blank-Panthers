@@ -362,13 +362,6 @@
                   "kind": "scalar"
                 }
               },
-              "playerId": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
               "preferredMode": {
                 "nullable": false,
                 "type": {
@@ -562,9 +555,6 @@
                 },
                 "id": {
                   "column": "id"
-                },
-                "playerId": {
-                  "column": "playerId"
                 },
                 "preferredMode": {
                   "column": "preferredMode"
@@ -1729,11 +1719,6 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "playerId": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
-                },
                 "preferredMode": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1885,13 +1870,6 @@
                     "codmUsername"
                   ],
                   "name": "Member_codmUsername_key",
-                  "unique": true
-                },
-                {
-                  "columns": [
-                    "playerId"
-                  ],
-                  "name": "Member_playerId_key",
                   "unique": true
                 },
                 {
@@ -2624,7 +2602,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "88278bf13a339a3d736466447deae33fc5dfc4866fd95e4eb11245fba30937fa"
+    "storageHash": "8068f7ca293d976d213a9cd81ba8266e8d61ba13fbe753bb630f6c34c74541f5"
   },
   "execution": {
     "executionHash": "eb4f07737e6bf02eb6fb4c42b4d2bd83538f71ffad9609ae0a2554eb0a1db1d1",

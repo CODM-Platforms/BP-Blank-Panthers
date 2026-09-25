@@ -42,7 +42,6 @@ interface Participant {
   member: {
     fullName: string;
     codmUsername: string;
-    playerId: string;
     codmUid: string;
     deviceModel: string;
     whatsappNumber: string;
@@ -122,10 +121,6 @@ export default function TournamentRosterPdf({
                   <View style={styles.cardBody}>
                     <Text style={styles.cardName}>{p.member.fullName}</Text>
                     <Text style={styles.cardIgn}>{p.member.codmUsername}</Text>
-                    <View style={styles.cardRow}>
-                      <Text style={styles.cardLabel}>Player ID</Text>
-                      <Text style={styles.cardValue}>{p.member.playerId}</Text>
-                    </View>
                     <View style={styles.cardRow}>
                       <Text style={styles.cardLabel}>UID</Text>
                       <Text style={styles.cardValue}>{p.member.codmUid}</Text>
