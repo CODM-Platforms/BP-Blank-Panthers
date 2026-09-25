@@ -236,7 +236,7 @@ export default function TacticalJoinPage() {
                       Player ID
                     </label>
                     <div className="relative flex items-center">
-                      <input name="playerId" type="text" required inputMode="numeric" onChange={handleNumericInput} placeholder="Numbers only..." className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md pl-10 focus:outline-none focus:bg-surface-container transition-all tracking-widest font-mono" />
+                      <input name="playerId" type="text" required placeholder="e.g. PILATO" className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md pl-10 focus:outline-none focus:bg-surface-container transition-all tracking-widest font-mono" />
                       <span className="material-symbols-outlined text-[18px] text-outline absolute left-3 pointer-events-none">numbers</span>
                     </div>
                   </div>
@@ -264,10 +264,10 @@ export default function TacticalJoinPage() {
                   <div className="flex flex-col gap-space-xs">
                     <label className="font-label-sm text-label-sm tracking-widest uppercase text-on-surface-variant flex items-center gap-1">
                       <span className="material-symbols-outlined text-[13px] text-primary-container">memory</span>
-                      Serial (Last 4)
+                      Serial (Last 6)
                     </label>
                     <div className="relative flex items-center">
-                      <input name="deviceSerial" type="text" required maxLength={4} inputMode="numeric" onChange={handleNumericInput} placeholder="e.g. 7824" className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md pl-10 focus:outline-none focus:bg-surface-container transition-all tracking-widest font-mono" />
+                      <input name="deviceSerial" type="text" required maxLength={6} placeholder="e.g. 0D29XD" className="w-full h-11 bg-surface-container-lowest text-on-surface placeholder:text-outline/50 font-body-md text-body-md rounded-lg px-space-md pl-10 focus:outline-none focus:bg-surface-container transition-all tracking-widest font-mono" />
                       <span className="material-symbols-outlined text-[18px] text-outline absolute left-3 pointer-events-none">sim_card</span>
                     </div>
                   </div>
