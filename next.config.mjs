@@ -3,15 +3,12 @@ const nextConfig = {
   // Enable React strict mode for highlighting potential problems
   reactStrictMode: true,
 
-  // temporal-polyfill's ESM build uses a top-level-await shape that
-  // webpack can't represent in the CommonJS server bundles Next 14 emits
-  // for Server Actions / Route Handlers (serverComponentsExternalPackages
-  // only reliably covers RSC pages in this version). Force it - and pg,
-  // its usual companion - to stay an unbundled runtime require() instead.
+  // pg is a native-ish runtime dependency; leave it unbundled and let Node
+  // resolve it natively at runtime instead of forcing it through webpack.
   webpack: (config, { isServer }) => {
     if (isServer) {
       const externals = Array.isArray(config.externals) ? config.externals : [config.externals];
-      config.externals = [...externals, 'temporal-polyfill', 'pg'];
+      config.externals = [...externals, 'pg'];
     }
     return config;
   },
