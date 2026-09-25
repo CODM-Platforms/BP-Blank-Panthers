@@ -264,3 +264,78 @@ export async function cancelTournament(tournamentId: string) {
   revalidatePath(`/admin/tournaments/${tournamentId}`);
   revalidatePath('/tournaments');
 }
+
+export async function updateTournament(tournamentId: string, formData: FormData) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const name = formData.get('name') as string;
+  const mode = formData.get('mode') as string;
+  const teamSize = Number(formData.get('teamSize'));
+  const maxPlayers = Number(formData.get('maxPlayers'));
+  const tournamentDate = new Date(formData.get('tournamentDate') as string);
+  const tournamentEnd = new Date(formData.get('tournamentEnd') as string);
+  const registrationEnd = new Date(formData.get('registrationEnd') as string);
+
+  if (!name || !mode || !teamSize || !maxPlayers || isNaN(tournamentDate.getTime()) || isNaN(tournamentEnd.getTime()) || isNaN(registrationEnd.getTime())) {
+    throw new Error('Missing or invalid tournament fields.');
+  }
+  if (tournamentEnd.getTime() <= tournamentDate.getTime()) {
+    throw new Error('End Time must be after Start Time.');
+  }
+
+  await db.orm.public.Tournament.where({ id: tournamentId }).update({
+    name,
+    mode: mode as 'BR' | 'MP' | 'CUSTOM',
+    teamSize,
+    maxPlayers,
+    tournamentDate: toTemporalDateTime(tournamentDate),
+    tournamentEnd: toTemporalDateTime(tournamentEnd),
+    registrationEnd: toTemporalDateTime(registrationEnd),
+  });
+
+  await db.orm.public.AuditLog.create({
+    action: 'TOURNAMENT_UPDATED',
+    details: `Tournament "${name}" (${tournamentId}) edited by ${actor.name} (${actor.id}).`,
+    userId: actor.id,
+  });
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/tournaments');
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath('/tournaments');
+  revalidatePath(`/tournaments/${tournamentId}`);
+  redirect(`/admin/tournaments/${tournamentId}`);
+}
+
+export async function deleteTournament(tournamentId: string) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const tournament = await db.orm.public.Tournament.first({ id: tournamentId });
+  if (!tournament) {
+    throw new Error('Tournament not found');
+  }
+
+  // Clear dependents first - none of these relations cascade at the DB
+  // level, and Participant.teamId would block deleting Team rows otherwise.
+  await db.orm.public.TournamentPhoto.where({ tournamentId }).delete();
+  await db.orm.public.Participant.where({ tournamentId }).delete();
+  await db.orm.public.Team.where({ tournamentId }).delete();
+  await db.orm.public.Tournament.where({ id: tournamentId }).delete();
+
+  await db.orm.public.AuditLog.create({
+    action: 'TOURNAMENT_DELETED',
+    details: `Tournament "${tournament.name}" (${tournamentId}) deleted by ${actor.name} (${actor.id}).`,
+    userId: actor.id,
+  });
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/tournaments');
+  revalidatePath('/tournaments');
+  redirect('/admin/tournaments');
+}

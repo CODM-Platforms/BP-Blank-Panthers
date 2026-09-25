@@ -9,6 +9,55 @@ import { toTemporalDateTime } from '@/lib/temporal';
 const VALID_STATUSES = ['ACTIVE', 'WARNING', 'SUSPENDED', 'INACTIVE', 'REMOVED'] as const;
 type MemberStatus = (typeof VALID_STATUSES)[number];
 
+export async function updateMemberProfile(memberId: string, formData: FormData) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  const fullName = formData.get('fullName') as string;
+  const codmUsername = formData.get('codmUsername') as string;
+  const codmUid = formData.get('codmUid') as string;
+  const whatsappNumber = formData.get('whatsappNumber') as string;
+  const deviceModel = formData.get('deviceModel') as string;
+  const deviceSerial = formData.get('deviceSerial') as string;
+  const country = formData.get('country') as string;
+  const region = formData.get('region') as string;
+  const preferredMode = formData.get('preferredMode') as string;
+
+  if (!fullName || !codmUsername || !codmUid || !whatsappNumber || !deviceModel || !deviceSerial || !country || !region || !preferredMode) {
+    throw new Error('All fields are required.');
+  }
+
+  try {
+    await db.orm.public.Member.where({ id: memberId }).update({
+      fullName,
+      codmUsername,
+      codmUid,
+      whatsappNumber,
+      deviceModel,
+      deviceSerial,
+      country,
+      region,
+      preferredMode,
+    });
+  } catch (e) {
+    throw new Error('Update failed - CODM Username, UID, or WhatsApp number may already be taken by another member.');
+  }
+
+  await db.orm.public.AuditLog.create({
+    action: 'MEMBER_PROFILE_UPDATED',
+    details: `Member ${memberId} profile edited by ${actor.name} (${actor.id}).`,
+    userId: actor.id,
+  });
+
+  revalidatePath('/admin/members');
+  revalidatePath(`/admin/members/${memberId}`);
+  revalidatePath('/roster');
+  revalidatePath(`/player/${codmUsername}`);
+  redirect(`/admin/members/${memberId}`);
+}
+
 export async function updateMemberStatus(memberId: string, formData: FormData) {
   const actor = await getSessionUser();
   if (!actor) {

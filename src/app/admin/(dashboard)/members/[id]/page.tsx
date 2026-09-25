@@ -2,7 +2,7 @@ import { db } from '@/prisma/db';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { toJsDate } from '@/lib/temporal';
-import { updateMemberStatus } from '@/app/admin/members/actions';
+import { updateMemberStatus, updateMemberProfile } from '@/app/admin/members/actions';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
 
 export default async function MemberDetail({ params }: { params: { id: string } }) {
@@ -24,6 +24,7 @@ export default async function MemberDetail({ params }: { params: { id: string } 
   }
 
   const updateStatus = updateMemberStatus.bind(null, member.id);
+  const updateProfile = updateMemberProfile.bind(null, member.id);
 
   const isStaff = !!member.user;
 
@@ -91,6 +92,57 @@ export default async function MemberDetail({ params }: { params: { id: string } 
         <div><span className="block text-xl font-bold text-red-400">{member.tournamentsMissed}</span><span className="text-outline text-xs">Missed</span></div>
         <div><span className="block text-xl font-bold text-yellow-400">{member.tournamentsDeclined}</span><span className="text-outline text-xs">Declined</span></div>
       </div>
+
+      <form action={updateProfile} className="bg-surface-container-low border border-surface-container-high rounded-xl p-6 space-y-4">
+        <h2 className="text-lg font-bold text-on-surface">Edit Profile</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">Full Name</label>
+            <input name="fullName" type="text" required defaultValue={member.fullName} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">CODM Username</label>
+            <input name="codmUsername" type="text" required defaultValue={member.codmUsername} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface font-mono focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">CODM UID</label>
+            <input name="codmUid" type="text" required defaultValue={member.codmUid} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface font-mono focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">WhatsApp Number</label>
+            <input name="whatsappNumber" type="text" required defaultValue={member.whatsappNumber} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface font-mono focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">Device Model</label>
+            <input name="deviceModel" type="text" required defaultValue={member.deviceModel} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">Device Serial (last 6)</label>
+            <input name="deviceSerial" type="text" required maxLength={6} defaultValue={member.deviceSerial} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface font-mono focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">Country</label>
+            <input name="country" type="text" required defaultValue={member.country} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">Region</label>
+            <input name="region" type="text" required defaultValue={member.region} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">Preferred Mode</label>
+            <select name="preferredMode" defaultValue={member.preferredMode} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container appearance-none">
+              <option value="BR">Battle Royale (BR)</option>
+              <option value="MP">Multiplayer (MP)</option>
+              <option value="Both">Both</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" className="px-6 py-3 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">
+          Save Profile
+        </button>
+      </form>
 
       <form action={updateStatus} className="bg-surface-container-low border border-surface-container-high rounded-xl p-6 space-y-4">
         <h2 className="text-lg font-bold text-on-surface">Manage Status</h2>

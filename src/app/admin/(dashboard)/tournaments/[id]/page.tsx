@@ -1,4 +1,4 @@
-import { Users, ShieldCheck, Download } from 'lucide-react';
+import { Users, ShieldCheck, Download, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
@@ -7,6 +7,7 @@ import { getBaseUrl } from '@/lib/url';
 import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete, autoProgressAttendance } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 import TournamentPhotos from '@/components/admin/TournamentPhotos';
+import DeleteTournamentButton from '@/components/admin/DeleteTournamentButton';
 
 export default async function TournamentControlCenter({ params }: { params: { id: string } }) {
   let tournament = null;
@@ -89,6 +90,10 @@ export default async function TournamentControlCenter({ params }: { params: { id
           <Link href={`/admin/tournaments/${tournament.id}/teams`} className="px-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-on-surface hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
             <Users className="w-4 h-4" /> Team Builder
           </Link>
+          <Link href={`/admin/tournaments/${tournament.id}/edit`} className="px-4 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-on-surface hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2">
+            <Pencil className="w-4 h-4" /> Edit
+          </Link>
+          <DeleteTournamentButton tournamentId={tournament.id} tournamentName={tournament.name} />
           {tournament.status === 'DRAFT' && (
             <form action={doPublish}>
               <button type="submit" className="px-4 py-2 bg-primary-container text-surface-container-lowest rounded-lg font-bold hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">

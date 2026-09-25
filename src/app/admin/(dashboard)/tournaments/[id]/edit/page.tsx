@@ -1,0 +1,139 @@
+import { Trophy, Calendar, Users, Gamepad2 } from 'lucide-react';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { db } from '@/prisma/db';
+import { toJsDate } from '@/lib/temporal';
+import { updateTournament } from '@/app/admin/tournaments/actions';
+
+// yyyy-MM-ddThh:mm in the viewer's local time, which is what a
+// datetime-local input's defaultValue needs.
+function toLocalInputValue(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+export default async function EditTournament({ params }: { params: { id: string } }) {
+  let tournament = null;
+  let dbError: string | null = null;
+  try {
+    tournament = await db.orm.public.Tournament.first({ id: params.id });
+  } catch (e) {
+    console.error('DB error', e);
+    dbError = e instanceof Error ? e.message : String(e);
+  }
+
+  if (dbError) {
+    return (
+      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-red-400">
+        <p className="font-bold mb-1">Failed to load this tournament.</p>
+        <p className="text-sm font-mono">{dbError}</p>
+      </div>
+    );
+  }
+
+  if (!tournament) {
+    notFound();
+  }
+
+  const doUpdate = updateTournament.bind(null, tournament.id);
+
+  return (
+    <div className="max-w-4xl mx-auto animate-fade-in">
+      <div className="mb-8">
+        <Link href={`/admin/tournaments/${tournament.id}`} className="text-sm text-outline hover:text-primary-container mb-2 inline-block">
+          &larr; Back to Tournament
+        </Link>
+        <h1 className="text-3xl font-bold text-on-surface">Edit Tournament</h1>
+        <p className="text-outline mt-2">Update the details for {tournament.name}.</p>
+      </div>
+
+      <div className="bg-surface-container-low border border-surface-container-high rounded-xl p-8">
+        <form action={doUpdate} className="space-y-8">
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-primary-container border-b border-surface-container-high pb-2 flex items-center gap-2">
+              <Trophy className="w-5 h-5" /> Basic Information
+            </h3>
+
+            <div>
+              <label className="block text-sm font-medium text-outline mb-1">Tournament Name</label>
+              <input type="text" name="name" required defaultValue={tournament.name} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Game</label>
+                <input type="text" defaultValue="Call of Duty Mobile" disabled className="w-full bg-surface-container-lowest/50 border border-surface-container-high rounded-lg px-4 py-3 text-outline cursor-not-allowed" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Mode</label>
+                <div className="relative">
+                  <Gamepad2 className="absolute left-3 top-3.5 w-5 h-5 text-outline" />
+                  <select name="mode" required defaultValue={tournament.mode} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg pl-10 pr-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors appearance-none">
+                    <option value="BR">Battle Royale (BR)</option>
+                    <option value="MP">Multiplayer (MP)</option>
+                    <option value="CUSTOM">Custom Mode</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-primary-container border-b border-surface-container-high pb-2 flex items-center gap-2">
+              <Users className="w-5 h-5" /> Capacity & Teams
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Format (Team Size)</label>
+                <select name="teamSize" required defaultValue={String(tournament.teamSize)} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors appearance-none">
+                  <option value="4">Squad (4 Players)</option>
+                  <option value="5">Team (5 Players)</option>
+                  <option value="2">Duo (2 Players)</option>
+                  <option value="1">Solo (1 Player)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Maximum Players</label>
+                <input type="number" name="maxPlayers" required defaultValue={tournament.maxPlayers} min={1} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-primary-container border-b border-surface-container-high pb-2 flex items-center gap-2">
+              <Calendar className="w-5 h-5" /> Schedule
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Registration Deadline</label>
+                <input type="datetime-local" name="registrationEnd" required defaultValue={toLocalInputValue(toJsDate(tournament.registrationEnd))} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+              </div>
+              <div></div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Start Time</label>
+                <input type="datetime-local" name="tournamentDate" required defaultValue={toLocalInputValue(toJsDate(tournament.tournamentDate))} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">End Time</label>
+                <input type="datetime-local" name="tournamentEnd" required defaultValue={tournament.tournamentEnd ? toLocalInputValue(toJsDate(tournament.tournamentEnd)) : ''} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
+              </div>
+            </div>
+            <p className="text-xs text-outline">Attendance is marked automatically once the End Time passes.</p>
+          </div>
+
+          <div className="pt-4 flex items-center justify-end gap-4 border-t border-surface-container-high">
+            <Link href={`/admin/tournaments/${tournament.id}`} className="px-6 py-3 rounded-lg text-outline hover:text-on-surface transition-colors">
+              Cancel
+            </Link>
+            <button type="submit" className="px-8 py-3 bg-primary-container text-surface-container-lowest rounded-lg font-bold hover:bg-primary-fixed-dim transition-colors shadow-[0_0_15px_rgba(255,59,59,0.3)]">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
