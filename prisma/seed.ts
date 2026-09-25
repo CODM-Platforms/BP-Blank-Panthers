@@ -16,6 +16,7 @@ interface SeedMemberProfile {
   country: string;
   region: string;
   preferredMode: PreferredMode;
+  profilePicture?: string; // path under public/, e.g. /members/bp404.jpeg
 }
 
 interface SeedAdmin {
@@ -50,6 +51,7 @@ const admins: SeedAdmin[] = [
       country: 'Tanzania',
       region: 'Zanzibar',
       preferredMode: 'Both',
+      profilePicture: '/members/bp404.jpeg',
     },
   },
   {
@@ -69,6 +71,7 @@ const admins: SeedAdmin[] = [
       country: 'Tanzania',
       region: 'Dar es Salaam',
       preferredMode: 'Both',
+      profilePicture: '/members/bpguitzy.jpeg',
     },
   },
   { name: 'Clan Master Two', email: 'master2@bp-panthers.com', role: 'CLAN_MASTER', isLead: false, passwordEnv: 'SEED_MASTER2_PASSWORD' },
@@ -108,6 +111,7 @@ async function main() {
           country: m.country,
           region: m.region,
           preferredMode: m.preferredMode,
+          profilePicture: m.profilePicture ?? null,
           status: 'ACTIVE',
         });
         memberId = created.id;
@@ -123,6 +127,7 @@ async function main() {
           country: m.country,
           region: m.region,
           preferredMode: m.preferredMode,
+          profilePicture: m.profilePicture ?? null,
           status: 'ACTIVE',
         });
         memberId = existingMember.id;
