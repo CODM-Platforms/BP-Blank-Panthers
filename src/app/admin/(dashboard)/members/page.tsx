@@ -2,6 +2,7 @@ import { Users, Search, Filter, ShieldCheck, AlertTriangle, Ban } from 'lucide-r
 import { db } from '@/prisma/db';
 import Link from 'next/link';
 import Image from 'next/image';
+import { toJsDate } from '@/lib/temporal';
 
 export default async function MembersDashboard() {
   // Fetch real members from the database
@@ -125,7 +126,7 @@ export default async function MembersDashboard() {
                       </div>
                       <div className="text-xs text-panther-text">Tournaments</div>
                     </td>
-                    <td className="p-4 text-sm text-panther-text">{new Date(member.createdAt).toLocaleDateString()}</td>
+                    <td className="p-4 text-sm text-panther-text">{toJsDate(member.createdAt).toLocaleDateString()}</td>
                     <td className="p-4 text-right">
                       {member.status === 'PENDING' ? (
                         <form action={`/api/members/${member.id}/approve`} method="POST">

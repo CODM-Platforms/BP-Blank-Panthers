@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { db } from '@/prisma/db';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import { toJsDate } from '@/lib/temporal';
 
 export default async function PlayerStats({ params }: { params: { codmUsername: string } }) {
   
@@ -97,7 +98,7 @@ export default async function PlayerStats({ params }: { params: { codmUsername: 
                 <div key={p.id} className="p-6 flex flex-col md:flex-row justify-between md:items-center gap-4 hover:bg-panther-dark/30 transition-colors">
                   <div>
                     <h3 className="font-bold text-white text-lg">{p.tournament.name}</h3>
-                    <p className="text-sm text-panther-text mt-1">{new Date(p.tournament.tournamentDate).toLocaleDateString()} • {p.tournament.mode}</p>
+                    <p className="text-sm text-panther-text mt-1">{toJsDate(p.tournament.tournamentDate).toLocaleDateString()} • {p.tournament.mode}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     {p.team && (

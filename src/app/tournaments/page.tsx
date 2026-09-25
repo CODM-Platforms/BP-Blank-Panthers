@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
+import { toJsDate } from '@/lib/temporal';
 
 export default async function PublicTournaments() {
   let tournaments: any[] = [];
@@ -70,7 +71,7 @@ export default async function PublicTournaments() {
                         <div className="flex flex-col">
                           <h3 className="font-title-lg text-xl font-bold text-on-surface mb-1 uppercase tracking-wider">{t.name}</h3>
                           <div className="flex items-center gap-3 text-outline font-mono text-[11px]">
-                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">calendar_today</span> {new Date(t.tournamentDate).toLocaleDateString()}</span>
+                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">calendar_today</span> {toJsDate(t.tournamentDate).toLocaleDateString()}</span>
                             <span>{t.mode} | {t.teamSize}v{t.teamSize}</span>
                           </div>
                         </div>
@@ -117,7 +118,7 @@ export default async function PublicTournaments() {
                     <div className="p-space-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       <div className="flex flex-col">
                         <h3 className="font-title-md text-on-surface uppercase tracking-wider">{t.name}</h3>
-                        <p className="text-outline font-mono text-[10px] mt-1">LOGGED ON: {new Date(t.tournamentDate).toLocaleDateString()} • {t.mode}</p>
+                        <p className="text-outline font-mono text-[10px] mt-1">LOGGED ON: {toJsDate(t.tournamentDate).toLocaleDateString()} • {t.mode}</p>
                       </div>
                       <Link href={`/tournaments/${t.id}/results`} className="px-4 py-2 bg-surface-container-highest border border-surface-container-high hover:border-primary-container rounded-lg transition-colors font-label-sm uppercase tracking-widest text-outline hover:text-primary-container">
                         View Standings

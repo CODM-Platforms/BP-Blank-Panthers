@@ -2,6 +2,7 @@
 import { Users, Trophy, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/prisma/db';
+import { toJsDate } from '@/lib/temporal';
 
 export default async function AdminDashboard() {
   const stats = { total: 0, active: 0, pending: 0, suspended: 0, activeTournaments: 0 };
@@ -116,7 +117,7 @@ export default async function AdminDashboard() {
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="font-headline-lg text-headline-lg text-on-surface uppercase tracking-wider mb-1">{upcomingTournament.name}</h3>
-                    <p className="font-mono text-[11px] tracking-widest text-primary-container">{new Date(upcomingTournament.tournamentDate).toLocaleString()}</p>
+                    <p className="font-mono text-[11px] tracking-widest text-primary-container">{toJsDate(upcomingTournament.tournamentDate).toLocaleString()}</p>
                   </div>
                   <div className="text-right flex flex-col items-end">
                     <span className="inline-block px-3 py-1 bg-surface-container-highest border border-surface-container-high rounded-md text-[10px] font-mono text-outline mb-2 uppercase tracking-widest">

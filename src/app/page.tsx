@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
+import { toJsDate } from '@/lib/temporal';
 
 function loadActiveTournaments() {
   return db.orm.public.Tournament
@@ -118,7 +119,7 @@ export default async function Home() {
                   <div className="flex flex-col gap-1">
                     <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono">SYS.ID: {spotlightTournament.id.slice(-6)}</span>
                     <h3 className="font-headline-lg text-headline-lg uppercase text-on-surface text-[28px] mt-2">{spotlightTournament.name}</h3>
-                    <p className="font-body-md text-body-md text-primary-container mt-1">{spotlightTournament.mode} • {new Date(spotlightTournament.tournamentDate).toLocaleDateString()}</p>
+                    <p className="font-body-md text-body-md text-primary-container mt-1">{spotlightTournament.mode} • {toJsDate(spotlightTournament.tournamentDate).toLocaleDateString()}</p>
                   </div>
                   
                   {spotlightTournament.teams && spotlightTournament.teams.length > 0 && (

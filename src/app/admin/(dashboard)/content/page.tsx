@@ -1,6 +1,7 @@
 import { Edit3, Image as ImageIcon, Send, Calendar, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/prisma/db';
+import { toJsDate } from '@/lib/temporal';
 
 export default async function ContentManager() {
   // Fetch real posts from DB safely
@@ -90,7 +91,7 @@ export default async function ContentManager() {
                   </div>
                   <h3 className="text-white font-bold mb-2 line-clamp-2">{post.title}</h3>
                   <p className="text-xs text-panther-text flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> {new Date(post.createdAt).toLocaleDateString()}
+                    <Calendar className="w-3 h-3" /> {toJsDate(post.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               ))
