@@ -4,6 +4,7 @@ import { db } from '@/prisma/db';
 import { getSessionUser } from '@/lib/session';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { toTemporalDateTime } from '@/lib/temporal';
 
 export async function createPost(formData: FormData) {
   const actor = await getSessionUser();
@@ -32,7 +33,7 @@ export async function createPost(formData: FormData) {
     title,
     content,
     category: category as 'NEWS' | 'ACHIEVEMENT' | 'ANNOUNCEMENT' | 'TOURNAMENT',
-    publishedAt,
+    publishedAt: toTemporalDateTime(publishedAt),
   });
 
   revalidatePath('/admin/content');

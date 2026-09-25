@@ -4,6 +4,7 @@ import { db } from '@/prisma/db';
 import { getSessionUser } from '@/lib/session';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { toTemporalDateTime } from '@/lib/temporal';
 
 const VALID_STATUSES = ['ACTIVE', 'WARNING', 'SUSPENDED', 'INACTIVE', 'REMOVED'] as const;
 type MemberStatus = (typeof VALID_STATUSES)[number];
@@ -23,7 +24,7 @@ export async function updateMemberStatus(memberId: string, formData: FormData) {
   const suspensionDays = Number(formData.get('suspensionDays') ?? 0);
   const suspensionEnd =
     status === 'SUSPENDED' && suspensionDays > 0
-      ? new Date(Date.now() + suspensionDays * 24 * 60 * 60 * 1000)
+      ? toTemporalDateTime(new Date(Date.now() + suspensionDays * 24 * 60 * 60 * 1000))
       : null;
 
   await db.orm.public.Member.where({ id: memberId }).update({

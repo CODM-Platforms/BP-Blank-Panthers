@@ -5,6 +5,7 @@ import { getSessionUser } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
+import { toTemporalDateTime } from '@/lib/temporal';
 
 export async function createTournament(formData: FormData) {
   const actor = await getSessionUser();
@@ -34,8 +35,8 @@ export async function createTournament(formData: FormData) {
     mode: mode as 'BR' | 'MP' | 'CUSTOM',
     teamSize,
     maxPlayers,
-    tournamentDate,
-    registrationEnd,
+    tournamentDate: toTemporalDateTime(tournamentDate),
+    registrationEnd: toTemporalDateTime(registrationEnd),
     status: 'PUBLISHED',
   });
 

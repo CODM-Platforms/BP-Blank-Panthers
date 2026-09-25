@@ -1,3 +1,5 @@
+import { Temporal } from '@js-temporal/polyfill';
+
 /**
  * Prisma 8 returns Postgres timestamp columns as `Temporal` values (e.g.
  * `Temporal.PlainDateTime`), not JS `Date` objects. `new Date(temporalValue)`
@@ -41,6 +43,27 @@ export function toJsDate(value: unknown): Date {
   }
 
   return new Date(String(value));
+}
+
+/**
+ * The write side of the same problem: Postgres timestamp columns require an
+ * actual Temporal.PlainDateTime when *we* supply an explicit value (the ORM
+ * only auto-generates Temporal values itself for createdAt/updatedAt
+ * defaults) - passing a plain JS Date throws RUNTIME.ENCODE_FAILED
+ * ("encodes a Temporal.PlainDateTime, but received a Date"). Convert with
+ * the constructor directly (plain numeric fields in, no method calls) so
+ * this can't hit the same broken formatting path as the read side.
+ */
+export function toTemporalDateTime(date: Date): Temporal.PlainDateTime {
+  return new Temporal.PlainDateTime(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+    date.getMilliseconds()
+  );
 }
 
 function isTemporalLike(value: unknown): boolean {
