@@ -4,14 +4,19 @@ import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
 import { toJsDate, sanitizeForClient } from '@/lib/temporal';
 import { getBaseUrl } from '@/lib/url';
-import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete } from '@/app/admin/tournaments/actions';
+import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete, autoProgressAttendance } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 import TournamentPhotos from '@/components/admin/TournamentPhotos';
 
 export default async function TournamentControlCenter({ params }: { params: { id: string } }) {
   let tournament = null;
   let invitableMembers: any[] = [];
+  let dbError: string | null = null;
   try {
+    // Promote any still-CONFIRMED participants to ATTENDED once the
+    // tournament's start time has passed, before reading the roster below.
+    await autoProgressAttendance(params.id);
+
     tournament = await db.orm.public.Tournament
       .where({ id: params.id })
       .include('participants', (p) => p.include('member', (m) => m).include('team', (t) => t))
@@ -26,6 +31,19 @@ export default async function TournamentControlCenter({ params }: { params: { id
     }
   } catch (e) {
     console.error('DB error', e);
+    // A thrown query (e.g. a table the DB migration hasn't been applied
+    // for yet) is not the same thing as "this tournament doesn't exist" -
+    // conflating the two into notFound() hides real errors as a plain 404.
+    dbError = e instanceof Error ? e.message : String(e);
+  }
+
+  if (dbError) {
+    return (
+      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-red-400">
+        <p className="font-bold mb-1">Failed to load this tournament.</p>
+        <p className="text-sm font-mono">{dbError}</p>
+      </div>
+    );
   }
 
   if (!tournament) {

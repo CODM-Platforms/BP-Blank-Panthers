@@ -61,6 +61,13 @@ export default function TournamentParticipants({ participants, tournamentName, t
         ))}
       </div>
 
+      {tab === 'CONFIRMED' && (
+        <p className="px-6 pt-4 text-xs text-outline">
+          Confirmed players are marked Attended automatically once the tournament&apos;s start time passes - use
+          No-Show here only if you already know someone won&apos;t make it.
+        </p>
+      )}
+
       <div className="p-6">
         {shown.length === 0 ? (
           <p className="text-outline text-sm italic">No players in this category.</p>
@@ -71,7 +78,7 @@ export default function TournamentParticipants({ participants, tournamentName, t
                 <th className="pb-3 font-medium">Player</th>
                 <th className="pb-3 font-medium">UID</th>
                 <th className="pb-3 font-medium">Squad</th>
-                {(tab === 'PENDING' || tab === 'CONFIRMED') && <th className="pb-3 font-medium text-right">Action</th>}
+                {tab !== 'DECLINED' && <th className="pb-3 font-medium text-right">Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -97,22 +104,35 @@ export default function TournamentParticipants({ participants, tournamentName, t
                   )}
                   {tab === 'CONFIRMED' && (
                     <td className="py-4 text-right">
-                      <div className="flex gap-2 justify-end">
-                        <button
-                          disabled={isPending}
-                          onClick={() => handleAttendance(p.id, 'ATTENDED')}
-                          className="px-3 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded text-sm hover:bg-green-500/20 transition-colors disabled:opacity-50"
-                        >
-                          Attended
-                        </button>
-                        <button
-                          disabled={isPending}
-                          onClick={() => handleAttendance(p.id, 'NO_SHOW')}
-                          className="px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded text-sm hover:bg-red-500/20 transition-colors disabled:opacity-50"
-                        >
-                          No-Show
-                        </button>
-                      </div>
+                      <button
+                        disabled={isPending}
+                        onClick={() => handleAttendance(p.id, 'NO_SHOW')}
+                        className="px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded text-sm hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                      >
+                        Mark No-Show
+                      </button>
+                    </td>
+                  )}
+                  {tab === 'ATTENDED' && (
+                    <td className="py-4 text-right">
+                      <button
+                        disabled={isPending}
+                        onClick={() => handleAttendance(p.id, 'NO_SHOW')}
+                        className="px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded text-sm hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                      >
+                        Correct to No-Show
+                      </button>
+                    </td>
+                  )}
+                  {tab === 'NO_SHOW' && (
+                    <td className="py-4 text-right">
+                      <button
+                        disabled={isPending}
+                        onClick={() => handleAttendance(p.id, 'ATTENDED')}
+                        className="px-3 py-1 bg-green-500/10 border border-green-500/30 text-green-400 rounded text-sm hover:bg-green-500/20 transition-colors disabled:opacity-50"
+                      >
+                        Correct to Attended
+                      </button>
                     </td>
                   )}
                 </tr>

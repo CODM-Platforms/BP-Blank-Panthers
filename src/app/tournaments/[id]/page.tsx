@@ -6,6 +6,7 @@ import { toJsDate } from '@/lib/temporal';
 
 export default async function PublicTournamentDetail({ params }: { params: { id: string } }) {
   let tournament = null;
+  let dbError = false;
   try {
     tournament = await db.orm.public.Tournament
       .where({ id: params.id })
@@ -14,7 +15,15 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
       .include('photos', (p) => p.orderBy((ph) => ph.createdAt.desc()))
       .first();
   } catch (e) {
+    // A thrown query is not the same thing as "this tournament doesn't
+    // exist" - conflating the two into notFound() hides real errors
+    // behind a plain 404.
     console.error('DB error', e);
+    dbError = true;
+  }
+
+  if (dbError) {
+    throw new Error('Failed to load this tournament. Please try again shortly.');
   }
 
   if (!tournament) {

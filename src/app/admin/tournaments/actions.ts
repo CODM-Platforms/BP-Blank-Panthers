@@ -5,7 +5,7 @@ import { getSessionUser } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
-import { toTemporalDateTime } from '@/lib/temporal';
+import { toTemporalDateTime, toJsDate } from '@/lib/temporal';
 
 export async function createTournament(formData: FormData) {
   const actor = await getSessionUser();
@@ -117,23 +117,57 @@ export async function markAttendance(participantId: string, status: 'ATTENDED' |
   }
 
   const participant = await db.orm.public.Participant.first({ id: participantId });
-  if (!participant) {
-    throw new Error('Participant not found');
+  if (!participant || participant.attendanceStatus === status) {
+    return;
   }
 
+  const previousStatus = participant.attendanceStatus;
   await db.orm.public.Participant.where({ id: participantId }).update({ attendanceStatus: status });
 
   const member = await db.orm.public.Member.first({ id: participant.memberId });
   if (member) {
-    await db.orm.public.Member.where({ id: member.id }).update(
-      status === 'ATTENDED'
-        ? { tournamentsAttended: member.tournamentsAttended + 1 }
-        : { tournamentsMissed: member.tournamentsMissed + 1 }
-    );
+    // Undo whichever counter the previous status had bumped before applying
+    // the new one, so flipping a wrong auto/manual mark doesn't double-count.
+    let tournamentsAttended = member.tournamentsAttended;
+    let tournamentsMissed = member.tournamentsMissed;
+    if (previousStatus === 'ATTENDED') tournamentsAttended = Math.max(0, tournamentsAttended - 1);
+    if (previousStatus === 'NO_SHOW') tournamentsMissed = Math.max(0, tournamentsMissed - 1);
+    if (status === 'ATTENDED') tournamentsAttended += 1;
+    if (status === 'NO_SHOW') tournamentsMissed += 1;
+
+    await db.orm.public.Member.where({ id: member.id }).update({ tournamentsAttended, tournamentsMissed });
   }
 
   revalidatePath(`/admin/tournaments/${participant.tournamentId}`);
   revalidatePath(`/tournaments/${participant.tournamentId}`);
+}
+
+// Once a tournament's start time has passed, there's no real-world signal
+// left to click "Attended" for - everyone who confirmed showed up unless a
+// clan master says otherwise. Auto-promotes CONFIRMED to ATTENDED so the
+// admin only has to act on the exceptions (via markAttendance) instead of
+// clicking through every single confirmed player by hand. Called from the
+// tournament control-center page on every load rather than on a schedule -
+// this deployment has no cron runner, and re-running it is a no-op once
+// there's nothing left in CONFIRMED.
+export async function autoProgressAttendance(tournamentId: string) {
+  const tournament = await db.orm.public.Tournament.first({ id: tournamentId });
+  if (!tournament) return;
+  if (tournament.status === 'DRAFT' || tournament.status === 'COMPLETED' || tournament.status === 'CANCELLED') return;
+  if (toJsDate(tournament.tournamentDate).getTime() > Date.now()) return;
+
+  const stillConfirmed = await db.orm.public.Participant
+    .where({ tournamentId })
+    .where((p) => p.attendanceStatus.eq('CONFIRMED'))
+    .all();
+
+  for (const participant of stillConfirmed) {
+    await db.orm.public.Participant.where({ id: participant.id }).update({ attendanceStatus: 'ATTENDED' });
+    const member = await db.orm.public.Member.first({ id: participant.memberId });
+    if (member) {
+      await db.orm.public.Member.where({ id: member.id }).update({ tournamentsAttended: member.tournamentsAttended + 1 });
+    }
+  }
 }
 
 export async function saveResultsAndComplete(tournamentId: string, formData: FormData) {
