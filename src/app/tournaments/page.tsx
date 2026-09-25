@@ -4,14 +4,12 @@ import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
 
 export default async function PublicTournaments() {
-  let tournaments = [];
+  let tournaments: any[] = [];
   try {
-    tournaments = await db.tournament.findMany({
-      orderBy: { tournamentDate: 'desc' },
-      include: {
-        _count: { select: { participants: { where: { attendanceStatus: 'CONFIRMED' } } } }
-      }
-    });
+    tournaments = await db.orm.public.Tournament
+      .orderBy((t) => t.tournamentDate.desc())
+      .include('participants', (p) => p.where((pp) => pp.attendanceStatus.eq('CONFIRMED')).count())
+      .all();
   } catch(e) {
     console.error("DB not connected yet.");
   }
@@ -84,10 +82,10 @@ export default async function PublicTournaments() {
                       <div className="flex flex-col gap-2">
                         <div className="flex justify-between text-[11px] font-mono">
                           <span className="text-outline">Confirmed Operators</span>
-                          <span className="text-primary-container">{t._count.participants} / {t.maxPlayers}</span>
+                          <span className="text-primary-container">{t.participants} / {t.maxPlayers}</span>
                         </div>
                         <div className="w-full bg-surface-container-highest rounded-full h-1 border border-surface-container-high/50 overflow-hidden">
-                          <div className="bg-primary-container h-full" style={{ width: `${Math.min((t._count.participants/t.maxPlayers)*100, 100)}%` }}></div>
+                          <div className="bg-primary-container h-full" style={{ width: `${Math.min((t.participants/t.maxPlayers)*100, 100)}%` }}></div>
                         </div>
                       </div>
                       

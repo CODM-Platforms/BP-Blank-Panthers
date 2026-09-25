@@ -4,12 +4,12 @@ import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
 
 export default async function PublicRoster() {
-  let members = [];
+  let members: any[] = [];
   try {
-    members = await db.member.findMany({
-      where: { status: 'ACTIVE' },
-      orderBy: { tournamentsAttended: 'desc' }
-    });
+    members = await db.orm.public.Member
+      .where({ status: 'ACTIVE' })
+      .orderBy((m) => m.tournamentsAttended.desc())
+      .all();
   } catch (e) {
     console.error("DB error", e);
   }

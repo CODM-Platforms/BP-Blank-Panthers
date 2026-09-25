@@ -1,0 +1,53 @@
+name: DB Setup (migrate + seed)
+
+# Manually-triggered workflow to apply Prisma migrations and seed the admin
+# accounts against Neon. Exists because some networks have unreliable raw
+# Postgres (port 5432) connectivity to Neon's us-east-1 endpoint - GitHub's
+# runners don't have that problem.
+#
+# Before running: add these as repository secrets (Settings -> Secrets and
+# variables -> Actions -> New repository secret), using the same values from
+# your local .env:
+#   DATABASE_URL
+#   SEED_SUPERADMIN_PASSWORD
+#   SEED_MASTER1_PASSWORD
+#   SEED_MASTER2_PASSWORD
+#   SEED_MASTER3_PASSWORD
+#
+# Then: Actions tab -> "DB Setup (migrate + seed)" -> Run workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_seed:
+        description: 'Also run db:seed after migrating'
+        type: boolean
+        default: true
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SEED_SUPERADMIN_PASSWORD: ${{ secrets.SEED_SUPERADMIN_PASSWORD }}
+      SEED_MASTER1_PASSWORD: ${{ secrets.SEED_MASTER1_PASSWORD }}
+      SEED_MASTER2_PASSWORD: ${{ secrets.SEED_MASTER2_PASSWORD }}
+      SEED_MASTER3_PASSWORD: ${{ secrets.SEED_MASTER3_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Apply pending migrations
+        run: npx prisma db migrate
+
+      - name: Verify contract matches the database
+        run: npx prisma db verify
+
+      - name: Seed admin accounts
+        if: ${{ inputs.run_seed }}
+        run: npm run db:seed

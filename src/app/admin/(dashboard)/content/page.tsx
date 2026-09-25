@@ -4,11 +4,11 @@ import { db } from '@/prisma/db';
 
 export default async function ContentManager() {
   // Fetch real posts from DB safely
-  let posts = [];
+  let posts: any[] = [];
   try {
-    posts = await db.post.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    posts = await db.orm.public.Post
+      .orderBy((p) => p.createdAt.desc())
+      .all();
   } catch(e) {
     console.error("DB not connected yet.");
   }

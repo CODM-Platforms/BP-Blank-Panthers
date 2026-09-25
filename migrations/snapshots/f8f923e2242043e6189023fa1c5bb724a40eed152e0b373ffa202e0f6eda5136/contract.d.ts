@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'2756326ed411faced89e1ff142dc8813a68eb6e26b0ae0cff68d5731ee880a13'>;
+  StorageHashBase<'f8f923e2242043e6189023fa1c5bb724a40eed152e0b373ffa202e0f6eda5136'>;
 export type ExecutionHash =
   ExecutionHashBase<'eb4f07737e6bf02eb6fb4c42b4d2bd83538f71ffad9609ae0a2554eb0a1db1d1'>;
 export type ProfileHash =
@@ -350,7 +350,6 @@ export type FieldOutputTypes = {
       readonly role: 'SUPER_ADMIN' | 'CLAN_MASTER' | 'TOURNAMENT_MANAGER' | 'MODERATOR';
       readonly isLead: CodecTypes['pg/bool@1']['output'];
       readonly clanId: CodecTypes['pg/text@1']['output'] | null;
-      readonly memberId: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     };
@@ -458,7 +457,6 @@ export type FieldInputTypes = {
       readonly role: 'SUPER_ADMIN' | 'CLAN_MASTER' | 'TOURNAMENT_MANAGER' | 'MODERATOR';
       readonly isLead: CodecTypes['pg/bool@1']['input'];
       readonly clanId: CodecTypes['pg/text@1']['input'] | null;
-      readonly memberId: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamp-temporal@1']['input'];
     };
@@ -564,7 +562,6 @@ export type StorageColumnTypes = {
       readonly email: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly isLead: CodecTypes['pg/bool@1']['output'];
-      readonly memberId: CodecTypes['pg/text@1']['output'] | null;
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly password: CodecTypes['pg/text@1']['output'];
       readonly role: 'SUPER_ADMIN' | 'CLAN_MASTER' | 'TOURNAMENT_MANAGER' | 'MODERATOR';
@@ -672,7 +669,6 @@ export type StorageColumnInputTypes = {
       readonly email: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly isLead: CodecTypes['pg/bool@1']['input'];
-      readonly memberId: CodecTypes['pg/text@1']['input'] | null;
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly password: CodecTypes['pg/text@1']['input'];
       readonly role: 'SUPER_ADMIN' | 'CLAN_MASTER' | 'TOURNAMENT_MANAGER' | 'MODERATOR';
@@ -1396,11 +1392,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
                 };
-                readonly memberId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
                 readonly createdAt: {
                   readonly nativeType: 'timestamp';
                   readonly codecId: 'pg/timestamp-temporal@1';
@@ -1423,11 +1414,6 @@ type ContractBase = Omit<
                   readonly columns: readonly ['email'];
                   readonly unique: true;
                 },
-                {
-                  readonly name: 'User_memberId_key';
-                  readonly columns: readonly ['memberId'];
-                  readonly unique: true;
-                },
               ];
               foreignKeys: readonly [
                 {
@@ -1439,18 +1425,6 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'Clan';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'User';
-                    readonly columns: readonly ['memberId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'Member';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -1805,14 +1779,6 @@ type ContractBase = Omit<
                   readonly model: 'Participant';
                 };
                 readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['memberId'];
-                };
-              };
-              readonly user: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
-                readonly cardinality: '1:1';
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['memberId'];
@@ -2292,10 +2258,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly memberId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -2344,17 +2306,6 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
-              readonly member: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Member';
-                };
-                readonly cardinality: 'N:1';
-                readonly on: {
-                  readonly localFields: readonly ['memberId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
               readonly posts: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Post' };
                 readonly cardinality: '1:N';
@@ -2375,7 +2326,6 @@ type ContractBase = Omit<
                 readonly role: { readonly column: 'role' };
                 readonly isLead: { readonly column: 'isLead' };
                 readonly clanId: { readonly column: 'clanId' };
-                readonly memberId: { readonly column: 'memberId' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };

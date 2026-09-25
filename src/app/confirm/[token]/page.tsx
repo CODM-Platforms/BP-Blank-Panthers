@@ -109,7 +109,7 @@ export default function ConfirmAttendance({ params }: { params: { token: string 
                 onClick={handleConfirm}
                 className="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-green-500/20"
               >
-                <CheckCircle2 className="w-6 h-6" /> YES, I'LL ATTEND
+                <CheckCircle2 className="w-6 h-6" /> YES, I&apos;LL ATTEND
               </button>
               <button 
                 onClick={() => setShowDeclineForm(true)}
@@ -122,7 +122,7 @@ export default function ConfirmAttendance({ params }: { params: { token: string 
             <form onSubmit={handleDeclineSubmit} className="space-y-4 animate-fade-in">
               <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex gap-3 text-sm text-yellow-200">
                 <AlertCircle className="w-5 h-5 shrink-0" />
-                <p>Providing a reason helps leaders know why you can't make it and avoids no-show penalties.</p>
+                <p>Providing a reason helps leaders know why you can&apos;t make it and avoids no-show penalties.</p>
               </div>
               
               <div>

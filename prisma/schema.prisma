@@ -37,15 +37,28 @@ model User {
   password  String
   name      String
   role      Role     @default(MODERATOR)
-  
+
+  // When true, this user's identity is shown as the approver on every
+  // member approval, regardless of which clan master actually clicked
+  // approve. Exactly one user should carry this flag at a time.
+  isLead    Boolean  @default(dbgenerated("false"))
+
   clanId    String?
   clan      Clan?    @relation(fields: [clanId], references: [id])
-  
+
+  // Links this admin/clan-master account to their own roster entry, so an
+  // admin who is also a playing member can be invited to and attend the
+  // tournaments they manage, with full member profile info tracked like
+  // any other player.
+  memberId  String?  @unique
+  member    Member?  @relation("UserMember", fields: [memberId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  auditLogs AuditLog[]
-  posts       Post[]
+
+  auditLogs        AuditLog[]
+  posts            Post[]
+  approvedMembers  Member[]   @relation("MemberApprovedBy")
 }
 
 enum MemberStatus {
@@ -78,14 +91,24 @@ model Member {
   status          MemberStatus @default(PENDING)
   
   // Activity Tracking
-  tournamentsInvited   Int     @default(0)
-  tournamentsConfirmed Int     @default(0)
-  tournamentsAttended  Int     @default(0)
-  tournamentsMissed    Int     @default(0)
-  tournamentsDeclined  Int     @default(0)
+  tournamentsInvited   Int     @default(dbgenerated("0"))
+  tournamentsConfirmed Int     @default(dbgenerated("0"))
+  tournamentsAttended  Int     @default(dbgenerated("0"))
+  tournamentsMissed    Int     @default(dbgenerated("0"))
+  tournamentsDeclined  Int     @default(dbgenerated("0"))
   
   suspensionEnd        DateTime?
   adminNotes           String?   @db.Text
+
+  // The approver shown for this member's approval. Always set to the
+  // designated lead clan master (User.isLead), never to the account that
+  // actually clicked approve - see AuditLog for the real actor.
+  approvedById         String?
+  approvedBy           User?     @relation("MemberApprovedBy", fields: [approvedById], references: [id])
+
+  // Set when this roster entry belongs to an admin/clan-master account
+  // (see User.memberId) rather than (or in addition to) a public join.
+  user                 User?     @relation("UserMember")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -115,7 +138,7 @@ model Tournament {
   
   name            String
   description     String?          @db.Text
-  game            String           @default("Call of Duty Mobile")
+  game            String           @default(dbgenerated("'Call of Duty Mobile'"))
   mode            GameMode
   teamSize        Int
   maxPlayers      Int
@@ -170,8 +193,8 @@ model Team {
   tournament   Tournament  @relation(fields: [tournamentId], references: [id])
   
   placement    Int?
-  totalKills   Int?        @default(0)
-  totalPoints  Int?        @default(0)
+  totalKills   Int?        @default(dbgenerated("0"))
+  totalPoints  Int?        @default(dbgenerated("0"))
 
   participants Participant[]
 

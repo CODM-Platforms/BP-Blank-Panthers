@@ -4,22 +4,22 @@ import Link from 'next/link';
 import { db } from '@/prisma/db';
 
 export default async function AdminDashboard() {
-  let stats = { total: 0, active: 0, pending: 0, suspended: 0, activeTournaments: 0 };
-  let upcomingTournament = null;
-  let pendingMembers = [];
+  const stats = { total: 0, active: 0, pending: 0, suspended: 0, activeTournaments: 0 };
+  let upcomingTournament: any = null;
+  let pendingMembers: any[] = [];
 
   try {
-    const members = await db.member.findMany();
+    const members = await db.orm.public.Member.all();
     stats.total = members.length;
     stats.active = members.filter((m: any) => m.status === 'ACTIVE').length;
     stats.pending = members.filter((m: any) => m.status === 'PENDING').length;
     stats.suspended = members.filter((m: any) => m.status === 'SUSPENDED').length;
 
-    const tournaments = await db.tournament.findMany({
-      where: { status: { in: ['PUBLISHED', 'ONGOING'] } },
-      orderBy: { tournamentDate: 'asc' },
-      include: { _count: { select: { participants: { where: { attendanceStatus: 'CONFIRMED' } } } } }
-    });
+    const tournaments = await db.orm.public.Tournament
+      .where((t) => t.status.in(['PUBLISHED', 'ONGOING']))
+      .orderBy((t) => t.tournamentDate.asc())
+      .include('participants', (p) => p.where((pp) => pp.attendanceStatus.eq('CONFIRMED')).count())
+      .all();
     stats.activeTournaments = tournaments.length;
     
     if (tournaments.length > 0) {
@@ -128,11 +128,11 @@ export default async function AdminDashboard() {
 
                 <div className="space-y-2 mb-8">
                   <div className="flex justify-between font-mono text-[11px] tracking-widest">
-                    <span className="text-on-surface">CONFIRMED: {upcomingTournament._count.participants}</span>
+                    <span className="text-on-surface">CONFIRMED: {upcomingTournament.participants}</span>
                     <span className="text-outline">TARGET: {upcomingTournament.maxPlayers}</span>
                   </div>
                   <div className="w-full bg-surface-container-highest rounded-full h-1 border border-surface-container-high/50 overflow-hidden">
-                    <div className="bg-primary-container h-full" style={{ width: `${Math.min((upcomingTournament._count.participants/upcomingTournament.maxPlayers)*100, 100)}%` }}></div>
+                    <div className="bg-primary-container h-full" style={{ width: `${Math.min((upcomingTournament.participants/upcomingTournament.maxPlayers)*100, 100)}%` }}></div>
                   </div>
                 </div>
 

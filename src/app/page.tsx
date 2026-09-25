@@ -3,47 +3,57 @@ import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
 import { db } from '@/prisma/db';
 
+function loadActiveTournaments() {
+  return db.orm.public.Tournament
+    .where({ status: 'PUBLISHED' })
+    .orderBy((t) => t.tournamentDate.asc())
+    .limit(2)
+    .include('participants', (p) => p.count())
+    .all();
+}
+
+function loadRecentPosts() {
+  return db.orm.public.Post
+    .where({ category: 'NEWS' })
+    .orderBy((p) => p.createdAt.desc())
+    .limit(2)
+    .all();
+}
+
+async function loadSpotlightTournament() {
+  const completed = await db.orm.public.Tournament
+    .where({ status: 'COMPLETED' })
+    .orderBy((t) => t.tournamentDate.desc())
+    .limit(1)
+    .include('teams', (team) =>
+      team
+        .orderBy((t) => t.placement.asc())
+        .limit(1)
+        .include('participants', (p) => p.include('member', (m) => m)),
+    )
+    .all();
+  if (completed.length === 0) return null;
+  return completed[0];
+}
+
+function loadClanLeaders() {
+  return db.orm.public.User
+    .orderBy((u) => u.createdAt.asc())
+    .limit(3)
+    .all();
+}
+
 export default async function Home() {
-  let activeTournaments = [];
-  let recentPosts = [];
-  let spotlightTournament = null;
-  let clanLeaders = [];
-  
+  let activeTournaments: Awaited<ReturnType<typeof loadActiveTournaments>> = [];
+  let recentPosts: Awaited<ReturnType<typeof loadRecentPosts>> = [];
+  let spotlightTournament: Awaited<ReturnType<typeof loadSpotlightTournament>> = null;
+  let clanLeaders: Awaited<ReturnType<typeof loadClanLeaders>> = [];
+
   try {
-    activeTournaments = await db.tournament.findMany({
-      where: { status: 'PUBLISHED' },
-      orderBy: { tournamentDate: 'asc' },
-      take: 2,
-      include: { _count: { select: { participants: true } } }
-    });
-    
-    recentPosts = await db.post.findMany({
-      where: { category: 'NEWS' },
-      orderBy: { createdAt: 'desc' },
-      take: 2
-    });
-
-    const completed = await db.tournament.findMany({
-      where: { status: 'COMPLETED' },
-      orderBy: { tournamentDate: 'desc' },
-      take: 1,
-      include: {
-        teams: {
-          orderBy: { placement: 'asc' },
-          take: 1,
-          include: { participants: { include: { member: true } } }
-        }
-      }
-    });
-    if (completed.length > 0) {
-      spotlightTournament = completed[0];
-    }
-
-    clanLeaders = await db.user.findMany({
-      take: 3,
-      orderBy: { createdAt: 'asc' }
-    });
-
+    activeTournaments = await loadActiveTournaments();
+    recentPosts = await loadRecentPosts();
+    spotlightTournament = await loadSpotlightTournament();
+    clanLeaders = await loadClanLeaders();
   } catch(e) {
     console.error("DB not connected yet.");
   }
@@ -152,7 +162,7 @@ export default async function Home() {
                   <div className="flex flex-col">
                     <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono text-[9px] mb-1">UPCOMING SCIRM</span>
                     <span className="font-title-md text-title-md text-on-surface">{t.name}</span>
-                    <span className="font-body-sm text-body-sm text-on-surface-variant mt-1">{t.mode} • {t._count.participants}/{t.maxPlayers} Ops</span>
+                    <span className="font-body-sm text-body-sm text-on-surface-variant mt-1">{t.mode} • {t.participants}/{t.maxPlayers} Ops</span>
                   </div>
                   <Link href={"/tournaments/" + t.id} className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-outline group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
                     <span className="material-symbols-outlined">arrow_forward</span>

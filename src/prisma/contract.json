@@ -279,6 +279,13 @@
                   "kind": "scalar"
                 }
               },
+              "approvedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "clanId": {
                 "nullable": false,
                 "type": {
@@ -447,6 +454,22 @@
               }
             },
             "relations": {
+              "approvedBy": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "approvedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
               "clan": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -477,12 +500,31 @@
                   "model": "Participant",
                   "namespace": "public"
                 }
+              },
+              "user": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "memberId"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
                 "adminNotes": {
                   "column": "adminNotes"
+                },
+                "approvedById": {
+                  "column": "approvedById"
                 },
                 "clanId": {
                   "column": "clanId"
@@ -1248,6 +1290,20 @@
                   "kind": "scalar"
                 }
               },
+              "isLead": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "memberId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "name": {
                 "nullable": false,
                 "type": {
@@ -1284,6 +1340,21 @@
               }
             },
             "relations": {
+              "approvedMembers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "approvedById"
+                  ]
+                },
+                "to": {
+                  "model": "Member",
+                  "namespace": "public"
+                }
+              },
               "auditLogs": {
                 "cardinality": "1:N",
                 "on": {
@@ -1312,6 +1383,22 @@
                 },
                 "to": {
                   "model": "Clan",
+                  "namespace": "public"
+                }
+              },
+              "member": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "memberId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Member",
                   "namespace": "public"
                 }
               },
@@ -1344,6 +1431,12 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "isLead": {
+                  "column": "isLead"
+                },
+                "memberId": {
+                  "column": "memberId"
                 },
                 "name": {
                   "column": "name"
@@ -1564,6 +1657,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "approvedById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "clanId": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1665,8 +1763,8 @@
                 "tournamentsAttended": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": false
@@ -1674,8 +1772,8 @@
                 "tournamentsConfirmed": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": false
@@ -1683,8 +1781,8 @@
                 "tournamentsDeclined": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": false
@@ -1692,8 +1790,8 @@
                 "tournamentsInvited": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": false
@@ -1701,8 +1799,8 @@
                 "tournamentsMissed": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": false
@@ -1738,6 +1836,24 @@
                     ],
                     "namespaceId": "public",
                     "tableName": "Clan"
+                  }
+                },
+                {
+                  "onDelete": "setNull",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "approvedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Member"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
                   }
                 }
               ],
@@ -2091,8 +2207,8 @@
                 "totalKills": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": true
@@ -2100,8 +2216,8 @@
                 "totalPoints": {
                   "codecId": "pg/int4@1",
                   "default": {
-                    "kind": "literal",
-                    "value": 0
+                    "expression": "0",
+                    "kind": "function"
                   },
                   "nativeType": "int4",
                   "nullable": true
@@ -2175,8 +2291,8 @@
                 "game": {
                   "codecId": "pg/text@1",
                   "default": {
-                    "kind": "literal",
-                    "value": "Call of Duty Mobile"
+                    "expression": "'Call of Duty Mobile'",
+                    "kind": "function"
                   },
                   "nativeType": "text",
                   "nullable": false
@@ -2315,6 +2431,20 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "isLead": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "expression": "false",
+                    "kind": "function"
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "memberId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "name": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -2370,6 +2500,24 @@
                     "namespaceId": "public",
                     "tableName": "Clan"
                   }
+                },
+                {
+                  "onDelete": "setNull",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "memberId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Member"
+                  }
                 }
               ],
               "indexes": [
@@ -2378,6 +2526,13 @@
                     "email"
                   ],
                   "name": "User_email_key",
+                  "unique": true
+                },
+                {
+                  "columns": [
+                    "memberId"
+                  ],
+                  "name": "User_memberId_key",
                   "unique": true
                 }
               ],
@@ -2454,7 +2609,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7ead657f12eeb11ed68e8838f4f2c73a8608232adf2c80e9158f7778943c5bea"
+    "storageHash": "2756326ed411faced89e1ff142dc8813a68eb6e26b0ae0cff68d5731ee880a13"
   },
   "execution": {
     "executionHash": "eb4f07737e6bf02eb6fb4c42b4d2bd83538f71ffad9609ae0a2554eb0a1db1d1",

@@ -91,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <header className="h-24 bg-surface-container-lowest/80 backdrop-blur-xl border-b border-surface-container-high/50 flex items-center justify-between px-space-xl z-20">
           <div className="flex flex-col">
             <h1 className="font-headline-sm text-headline-sm uppercase text-on-surface tracking-tight">Active Operation</h1>
-            <span className="font-mono text-outline text-[11px] tracking-widest mt-1">SYS.DATE: {new Date().toLocaleDateString()} // STATUS: SECURE</span>
+            <span className="font-mono text-outline text-[11px] tracking-widest mt-1">{`SYS.DATE: ${new Date().toLocaleDateString()} // STATUS: SECURE`}</span>
           </div>
           
           <div className="flex items-center gap-space-lg">

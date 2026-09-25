@@ -7,12 +7,13 @@ export default async function MembersDashboard() {
   // Fetch real members from the database
   // We use a try-catch so the page doesn't crash if the DB isn't seeded yet
   let members: any[] = [];
-  let stats = { total: 0, active: 0, pending: 0, warning: 0, suspended: 0 };
+  const stats = { total: 0, active: 0, pending: 0, warning: 0, suspended: 0 };
 
   try {
-    members = await db.member.findMany({
-      orderBy: { createdAt: 'desc' }
-    });
+    members = await db.orm.public.Member
+      .orderBy((m) => m.createdAt.desc())
+      .include('approvedBy', (u) => u)
+      .all();
     
     stats.total = members.length;
     stats.active = members.filter(m => m.status === 'ACTIVE').length;
@@ -114,6 +115,9 @@ export default async function MembersDashboard() {
                       {member.status === 'ACTIVE' && <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded border border-green-500/20"><ShieldCheck className="w-3 h-3"/> Active</span>}
                       {member.status === 'WARNING' && <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-500/10 text-yellow-400 text-xs rounded border border-yellow-500/20"><AlertTriangle className="w-3 h-3"/> Warning</span>}
                       {member.status === 'SUSPENDED' && <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-400 text-xs rounded border border-red-500/20"><Ban className="w-3 h-3"/> Suspended</span>}
+                      {member.approvedBy && (
+                        <div className="text-[11px] text-panther-text mt-1">Approved by {member.approvedBy.name}</div>
+                      )}
                     </td>
                     <td className="p-4">
                       <div className="font-bold text-white">

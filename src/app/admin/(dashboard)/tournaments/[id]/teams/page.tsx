@@ -3,24 +3,26 @@ import Link from 'next/link';
 import { db } from '@/prisma/db';
 
 export default async function ManualTeamBuilder({ params }: { params: { id: string } }) {
-  let unassigned = [];
-  let teams = [];
-  let tournament = null;
+  let unassigned: any[] = [];
+  let teams: any[] = [];
+  let tournament: any = null;
 
   try {
-    tournament = await db.tournament.findUnique({ where: { id: params.id } });
-    
+    tournament = await db.orm.public.Tournament.first({ id: params.id });
+
     // Players who confirmed but don't have a team yet
-    unassigned = await db.participant.findMany({
-      where: { tournamentId: params.id, attendanceStatus: 'CONFIRMED', teamId: null },
-      include: { member: true }
-    });
+    unassigned = await db.orm.public.Participant
+      .where((p) => p.tournamentId.eq(params.id))
+      .where((p) => p.attendanceStatus.eq('CONFIRMED'))
+      .where((p) => p.teamId.isNull())
+      .include('member', (m) => m)
+      .all();
 
     // Existing teams and their players
-    teams = await db.team.findMany({
-      where: { tournamentId: params.id },
-      include: { participants: { include: { member: true } } }
-    });
+    teams = await db.orm.public.Team
+      .where({ tournamentId: params.id })
+      .include('participants', (p) => p.include('member', (m) => m))
+      .all();
   } catch(e) {
     console.error("DB error");
   }
@@ -95,7 +97,7 @@ export default async function ManualTeamBuilder({ params }: { params: { id: stri
                     </span>
                   </div>
                   <div className="p-4 space-y-2">
-                    {team.participants.map((p, seat) => (
+                    {team.participants.map((p: any, seat: number) => (
                       <div key={p.id} className="flex items-center gap-3 p-3 bg-panther-dark border border-panther-border rounded-lg cursor-grab">
                         <GripVertical className="w-4 h-4 text-panther-text" />
                         <div className="w-6 h-6 rounded bg-panther-card border border-panther-border flex items-center justify-center text-xs text-panther-text font-mono">{seat + 1}</div>

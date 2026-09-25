@@ -68,7 +68,7 @@ export default function AdminSettings() {
             <div className="border-t border-panther-border pt-6 mt-6 space-y-4">
               <label className="flex items-center justify-between p-4 bg-panther-dark border border-panther-border rounded-lg cursor-pointer hover:border-panther-gold/50 transition-colors">
                 <div>
-                  <h4 className="text-white font-bold text-sm">Count "Declined" as No-Show?</h4>
+                  <h4 className="text-white font-bold text-sm">Count &quot;Declined&quot; as No-Show?</h4>
                   <p className="text-panther-text text-xs mt-1">If a player declines before the tournament, does it count against them?</p>
                 </div>
                 <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">

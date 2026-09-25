@@ -1,8 +1,10 @@
 'use server'
 
 import { db } from '@/prisma/db';
+import { or } from '@prisma/orm-postgres/orm-client';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import bcrypt from 'bcryptjs';
 
 export async function authenticateAdmin(formData: FormData) {
   const identifier = formData.get('identifier') as string;
@@ -14,21 +16,17 @@ export async function authenticateAdmin(formData: FormData) {
 
   try {
     // 1. Find user by email or name (Callsign/IGN)
-    const user = await db.user.findFirst({
-      where: { 
-        OR: [
-          { email: identifier },
-          { name: identifier }
-        ]
-      }
-    });
+    const user = await db.orm.public.User
+      .where((u) => or(u.email.eq(identifier), u.name.eq(identifier)))
+      .first();
 
     if (!user) {
       return { error: 'Invalid operator credentials' };
     }
 
     // 2. Verify password
-    if (user.password !== password) {
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
       return { error: 'Invalid tactical cipher' };
     }
 

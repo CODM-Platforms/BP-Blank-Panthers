@@ -8,15 +8,15 @@ export default async function PlayerStats({ params }: { params: { codmUsername: 
   
   let player = null;
   try {
-    player = await db.member.findUnique({
-      where: { codmUsername: decodeURIComponent(params.codmUsername) },
-      include: {
-        participants: {
-          include: { tournament: true, team: true },
-          orderBy: { createdAt: 'desc' }
-        }
-      }
-    });
+    player = await db.orm.public.Member
+      .where({ codmUsername: decodeURIComponent(params.codmUsername) })
+      .include('participants', (p) =>
+        p
+          .orderBy((pp) => pp.createdAt.desc())
+          .include('tournament', (t) => t)
+          .include('team', (t) => t),
+      )
+      .first();
   } catch(e) {
     console.error("DB error", e);
   }
@@ -93,7 +93,7 @@ export default async function PlayerStats({ params }: { params: { codmUsername: 
             </div>
           ) : (
             <div className="divide-y divide-panther-border">
-              {player.participants.map(p => (
+              {player.participants.map((p: any) => (
                 <div key={p.id} className="p-6 flex flex-col md:flex-row justify-between md:items-center gap-4 hover:bg-panther-dark/30 transition-colors">
                   <div>
                     <h3 className="font-bold text-white text-lg">{p.tournament.name}</h3>
