@@ -17,6 +17,12 @@ name: DB Setup (migrate + seed)
 # Then: Actions tab -> "DB Setup (migrate + seed)" -> Run workflow.
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'migrations/**'
+      - 'prisma/**'
   workflow_dispatch:
     inputs:
       run_seed:
@@ -55,5 +61,5 @@ jobs:
         run: npx prisma db verify
 
       - name: Seed admin accounts
-        if: ${{ inputs.run_seed }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_seed }}
         run: npm run db:seed
