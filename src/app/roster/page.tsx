@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
+import RosterClient from '@/components/RosterClient';
 import { db } from '@/prisma/db';
 import { CLAN_TAG } from '@/config/clan';
 
@@ -17,6 +17,18 @@ export default async function PublicRoster() {
   } catch (e) {
     console.error('DB error', e);
   }
+
+  const serializedMembers = members.map((m: any) => ({
+    id: m.id,
+    fullName: m.fullName,
+    codmUsername: m.codmUsername,
+    preferredMode: m.preferredMode,
+    codmClass: m.codmClass ?? null,
+    region: m.region,
+    country: m.country,
+    tournamentsAttended: m.tournamentsAttended ?? 0,
+    profilePicture: m.profilePicture ?? null,
+  }));
 
   return (
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
@@ -38,10 +50,12 @@ export default async function PublicRoster() {
 
       <main className="relative z-10 w-full flex-1 flex flex-col items-center justify-start pt-10 pb-margin">
         {/* HERO */}
-        <section className="w-full max-w-6xl mx-auto px-margin-mobile md:px-margin pt-4 pb-12 flex flex-col gap-space-md border-b border-surface-container-high/50 mb-10">
+        <section className="w-full max-w-6xl mx-auto px-margin-mobile md:px-margin pt-4 pb-8 flex flex-col gap-space-sm border-b border-surface-container-high/50 mb-8">
           <div className="inline-flex items-center gap-2 px-space-md py-1 rounded-full border border-primary-container/30 bg-primary-container/5 backdrop-blur-md self-start">
             <span className="material-symbols-outlined text-[16px] text-primary-container">groups</span>
-            <span className="font-label-sm text-label-sm text-primary-container tracking-widest uppercase">Active Members</span>
+            <span className="font-label-sm text-label-sm text-primary-container tracking-widest uppercase">
+              Active Members ({serializedMembers.length})
+            </span>
           </div>
           <h1 className="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl uppercase text-on-surface tracking-tighter flex items-center gap-4">
             Clan Roster
@@ -52,60 +66,7 @@ export default async function PublicRoster() {
         </section>
 
         <div className="w-full max-w-6xl mx-auto px-margin-mobile md:px-margin">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-space-md">
-            {members.length === 0 ? (
-              <div className="col-span-full p-8 text-center border border-surface-container-high border-dashed rounded-xl text-outline font-mono text-sm">
-                No active clan members found yet.
-              </div>
-            ) : (
-              members.map((member: any) => (
-                <Link
-                  href={`/player/${encodeURIComponent(member.codmUsername)}`}
-                  key={member.id}
-                  className="bg-surface-container-low/80 backdrop-blur-xl border border-surface-container-high rounded-xl overflow-hidden hover:border-primary-container/50 transition-all hover:-translate-y-1 group relative flex flex-col"
-                >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-surface-container-highest group-hover:bg-primary-container transition-colors z-10"></div>
-
-                  <div className="aspect-square bg-surface-container-lowest relative border-b border-surface-container-high flex items-center justify-center overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent z-10"></div>
-                    {member.profilePicture ? (
-                      <img
-                        src={member.profilePicture}
-                        alt={member.codmUsername}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform opacity-70 group-hover:opacity-100 mix-blend-luminosity group-hover:mix-blend-normal"
-                      />
-                    ) : (
-                      <span className="material-symbols-outlined text-[64px] text-surface-container-highest group-hover:text-primary-container/30 transition-colors z-0">
-                        person
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="p-space-md text-center flex flex-col gap-2 relative z-20 -mt-8 bg-surface-container-lowest/80 backdrop-blur-md mx-space-sm rounded-lg border border-surface-container-high shadow-lg">
-                    <h3 className="font-headline-sm text-headline-sm text-on-surface truncate">{member.codmUsername}</h3>
-                    <p className="font-label-sm text-label-sm text-primary-container uppercase font-mono tracking-widest truncate">
-                      {member.preferredMode}
-                      {member.codmClass ? ` • ${member.codmClass}` : ''}
-                    </p>
-
-                    <div className="flex justify-between mt-2 pt-2 border-t border-surface-container-high/50">
-                      <div className="text-center flex-1">
-                        <span className="block text-[9px] text-outline uppercase font-mono tracking-widest">Tournaments</span>
-                        <span className="block font-title-sm text-on-surface flex items-center justify-center gap-1 mt-1">
-                          <span className="material-symbols-outlined text-[12px] text-primary-container">workspace_premium</span>{' '}
-                          {member.tournamentsAttended}
-                        </span>
-                      </div>
-                      <div className="text-center flex-1 border-l border-surface-container-high/50">
-                        <span className="block text-[9px] text-outline uppercase font-mono tracking-widest">Region</span>
-                        <span className="block font-title-sm text-on-surface mt-1 truncate px-1">{member.region}</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
+          <RosterClient members={serializedMembers} />
         </div>
       </main>
 

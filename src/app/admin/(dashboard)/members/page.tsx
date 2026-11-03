@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { db } from '@/prisma/db';
 import MembersTable from '@/components/admin/MembersTable';
 import { sanitizeForClient } from '@/lib/temporal';
@@ -46,7 +47,11 @@ export default async function MembersDashboard() {
           <h2 className="text-lg font-bold text-on-surface uppercase">Command Staff</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {commandStaff.map((m) => (
-              <div key={m.id} className="bg-surface-container-low border border-surface-container-high rounded-xl p-4 flex items-center gap-3">
+              <Link
+                key={m.id}
+                href={`/admin/members/${m.id}`}
+                className="bg-surface-container-low border border-surface-container-high hover:border-primary-container/50 rounded-xl p-4 flex items-center gap-3 transition-colors group"
+              >
                 <div className="w-12 h-12 rounded-full bg-surface-container-lowest border border-surface-container-high overflow-hidden flex items-center justify-center shrink-0">
                   {m.profilePicture ? (
                     <img src={m.profilePicture} alt={m.fullName} className="w-full h-full object-cover" />
@@ -54,11 +59,11 @@ export default async function MembersDashboard() {
                     <span className="material-symbols-outlined text-outline">person</span>
                   )}
                 </div>
-                <div className="min-w-0">
-                  <div className="font-bold text-on-surface truncate">{m.fullName}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-on-surface truncate group-hover:text-primary-container transition-colors">{m.fullName}</div>
                   <div className="text-xs text-primary-container font-mono truncate">{m.user.role.replace('_', ' ')}</div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

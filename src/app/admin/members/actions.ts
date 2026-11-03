@@ -27,23 +27,32 @@ export async function updateMemberProfile(memberId: string, formData: FormData) 
   const codmClassRaw = ((formData.get('codmClass') as string) || '').trim();
   const codmClass = codmClassRaw ? codmClassRaw : null;
 
+  const profilePictureChanged = formData.get('profilePictureChanged') === 'true';
+  const profilePictureRaw = (formData.get('profilePicture') as string) || '';
+
   if (!fullName || !codmUsername || !codmUid || !whatsappNumber || !deviceModel || !deviceSerial || !country || !region || !preferredMode) {
     throw new Error('All fields are required.');
   }
 
+  const updateData: Record<string, any> = {
+    fullName,
+    codmUsername,
+    codmUid,
+    whatsappNumber,
+    deviceModel,
+    deviceSerial,
+    country,
+    region,
+    preferredMode,
+    codmClass,
+  };
+
+  if (profilePictureChanged) {
+    updateData.profilePicture = profilePictureRaw ? profilePictureRaw : null;
+  }
+
   try {
-    await db.orm.public.Member.where({ id: memberId }).update({
-      fullName,
-      codmUsername,
-      codmUid,
-      whatsappNumber,
-      deviceModel,
-      deviceSerial,
-      country,
-      region,
-      preferredMode,
-      codmClass,
-    });
+    await db.orm.public.Member.where({ id: memberId }).update(updateData);
   } catch (e) {
     throw new Error('Update failed - CODM Username, UID, or WhatsApp number may already be taken by another member.');
   }
@@ -54,6 +63,8 @@ export async function updateMemberProfile(memberId: string, formData: FormData) 
     userId: actor.id,
   });
 
+  revalidatePath('/');
+  revalidatePath('/about');
   revalidatePath('/admin/members');
   revalidatePath(`/admin/members/${memberId}`);
   revalidatePath('/roster');
@@ -91,6 +102,8 @@ export async function updateMemberStatus(memberId: string, formData: FormData) {
     userId: actor.id,
   });
 
+  revalidatePath('/');
+  revalidatePath('/roster');
   revalidatePath('/admin/members');
   revalidatePath(`/admin/members/${memberId}`);
   redirect('/admin/members');

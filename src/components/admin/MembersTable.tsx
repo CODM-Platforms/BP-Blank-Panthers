@@ -112,17 +112,18 @@ export default function MembersTable({ members }: { members: any[] }) {
                   </td>
                   <td className="p-4 text-sm text-outline">{toJsDate(member.createdAt).toLocaleDateString()}</td>
                   <td className="p-4 text-right">
-                    {member.status === 'PENDING' ? (
-                      <form action={`/api/members/${member.id}/approve`} method="POST">
-                        <button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-on-surface rounded text-sm font-bold transition-colors">
-                          Approve
-                        </button>
-                      </form>
-                    ) : (
+                    <div className="flex items-center justify-end gap-3">
+                      {member.status === 'PENDING' && (
+                        <form action={`/api/members/${member.id}/approve`} method="POST">
+                          <button className="px-3 py-1 bg-green-500 hover:bg-green-600 text-on-surface rounded text-sm font-bold transition-colors">
+                            Approve
+                          </button>
+                        </form>
+                      )}
                       <Link href={`/admin/members/${member.id}`} className="text-sm text-outline hover:text-on-surface underline">
                         Manage
                       </Link>
-                    )}
+                    </div>
                   </td>
                 </tr>
               ))}
