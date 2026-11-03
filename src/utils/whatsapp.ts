@@ -17,7 +17,6 @@ export async function sendWhatsAppMessage(phoneNumber: string, message: string) 
       throw new Error(`Bot server responded with status: ${response.status}`);
     }
 
-    console.log(`Successfully queued message to ${phoneNumber}`);
     return { success: true };
   } catch (error) {
     console.error(`Failed to reach WhatsApp bot server:`, error);

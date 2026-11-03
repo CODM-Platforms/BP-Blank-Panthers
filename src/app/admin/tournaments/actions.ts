@@ -403,7 +403,7 @@ export async function addMemberDirectlyToTeam(tournamentId: string, memberId: st
   const actor = await getSessionUser();
   if (!actor) throw new Error('Not authorized');
 
-  let participant = await db.orm.public.Participant
+  const participant = await db.orm.public.Participant
     .where({ tournamentId, memberId })
     .first();
 
