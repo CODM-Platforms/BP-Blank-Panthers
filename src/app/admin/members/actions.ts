@@ -24,6 +24,8 @@ export async function updateMemberProfile(memberId: string, formData: FormData) 
   const country = formData.get('country') as string;
   const region = formData.get('region') as string;
   const preferredMode = formData.get('preferredMode') as string;
+  const codmClassRaw = ((formData.get('codmClass') as string) || '').trim();
+  const codmClass = codmClassRaw ? codmClassRaw : null;
 
   if (!fullName || !codmUsername || !codmUid || !whatsappNumber || !deviceModel || !deviceSerial || !country || !region || !preferredMode) {
     throw new Error('All fields are required.');
@@ -40,6 +42,7 @@ export async function updateMemberProfile(memberId: string, formData: FormData) 
       country,
       region,
       preferredMode,
+      codmClass,
     });
   } catch (e) {
     throw new Error('Update failed - CODM Username, UID, or WhatsApp number may already be taken by another member.');

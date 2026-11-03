@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.Member.codmClass",
+    "label": "Add column \"codmClass\" to \"Member\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "codmClass",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"codmClass\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Member",
+          "codmClass"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"codmClass\"",
+        "sql": "ALTER TABLE \"public\".\"Member\" ADD COLUMN \"codmClass\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"codmClass\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Member",
+          "codmClass"
+        ]
+      }
+    ]
+  }
+]

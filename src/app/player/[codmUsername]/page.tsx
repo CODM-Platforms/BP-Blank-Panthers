@@ -60,6 +60,11 @@ export default async function PlayerStats({ params }: { params: { codmUsername: 
                 <span className="px-3 py-1 bg-surface-container-highest border border-surface-container-high rounded text-xs font-mono text-on-surface flex items-center gap-2">
                   <span className="material-symbols-outlined text-[14px] text-primary-container">track_changes</span> {player.preferredMode}
                 </span>
+                {player.codmClass && (
+                  <span className="px-3 py-1 bg-surface-container-highest border border-surface-container-high rounded text-xs font-mono text-on-surface flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[14px] text-primary-container">shield</span> {player.codmClass}
+                  </span>
+                )}
                 <span className="px-3 py-1 bg-surface-container-highest border border-surface-container-high rounded text-xs font-mono text-on-surface flex items-center gap-2">
                   <span className="material-symbols-outlined text-[14px] text-primary-container">map</span> {player.region}, {player.country}
                 </span>

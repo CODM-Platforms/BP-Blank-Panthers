@@ -87,6 +87,7 @@ model Member {
   country         String
   region          String
   preferredMode   String       // BR, MP, Both
+  codmClass       String?      // Main CODM BR Class / MP Role (nullable so existing members don't break)
   profilePicture  String?
   status          MemberStatus @default(PENDING)
   

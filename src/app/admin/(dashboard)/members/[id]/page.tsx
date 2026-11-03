@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { toJsDate } from '@/lib/temporal';
 import { updateMemberStatus, updateMemberProfile } from '@/app/admin/members/actions';
 import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { ALL_CODM_CLASSES } from '@/config/clan';
 
 export default async function MemberDetail({ params }: { params: { id: string } }) {
   let member = null;
@@ -79,6 +80,7 @@ export default async function MemberDetail({ params }: { params: { id: string } 
         <div><span className="text-outline">Device</span><p className="text-on-surface">{member.deviceModel}</p></div>
         <div><span className="text-outline">Location</span><p className="text-on-surface">{member.region}, {member.country}</p></div>
         <div><span className="text-outline">Preferred Mode</span><p className="text-on-surface">{member.preferredMode}</p></div>
+        <div><span className="text-outline">CODM Class / Role</span><p className="text-on-surface">{member.codmClass ?? 'Not set'}</p></div>
         <div><span className="text-outline">Joined</span><p className="text-on-surface">{toJsDate(member.createdAt).toLocaleDateString()}</p></div>
         {member.approvedBy && (
           <div><span className="text-outline">Approved By</span><p className="text-on-surface">{member.approvedBy.name}</p></div>
@@ -136,6 +138,22 @@ export default async function MemberDetail({ params }: { params: { id: string } 
               <option value="MP">Multiplayer (MP)</option>
               <option value="Both">Both</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-outline mb-1">CODM Class / Role (Optional)</label>
+            <input
+              name="codmClass"
+              list="codm-classes-list"
+              type="text"
+              defaultValue={member.codmClass ?? ''}
+              placeholder="e.g. Ninja, Medic, Slayer..."
+              className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container"
+            />
+            <datalist id="codm-classes-list">
+              {ALL_CODM_CLASSES.map((cls) => (
+                <option key={cls} value={cls} />
+              ))}
+            </datalist>
           </div>
         </div>
 

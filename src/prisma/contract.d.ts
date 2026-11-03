@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'905b22516267fa22fa951888e9c5dc7e769b63c4f872a1e5d36022f21d8bc7a3'>;
+  StorageHashBase<'879f4f666a567bf15a6803921f781ccaccecdb84f59cd608eeedfd5446f20c13'>;
 export type ExecutionHash =
   ExecutionHashBase<'89a20b8aea7a7a1a83e9af714c3cc81e79b2ede71ec9a792f92e52630a14d80f'>;
 export type ProfileHash =
@@ -271,6 +271,7 @@ export type FieldOutputTypes = {
       readonly adminNotes: CodecTypes['pg/text@1']['output'] | null;
       readonly approvedById: CodecTypes['pg/text@1']['output'] | null;
       readonly clanId: CodecTypes['pg/text@1']['output'];
+      readonly codmClass: CodecTypes['pg/text@1']['output'] | null;
       readonly codmUid: CodecTypes['pg/text@1']['output'];
       readonly codmUsername: CodecTypes['pg/text@1']['output'];
       readonly country: CodecTypes['pg/text@1']['output'];
@@ -387,6 +388,7 @@ export type FieldInputTypes = {
       readonly adminNotes: CodecTypes['pg/text@1']['input'] | null;
       readonly approvedById: CodecTypes['pg/text@1']['input'] | null;
       readonly clanId: CodecTypes['pg/text@1']['input'];
+      readonly codmClass: CodecTypes['pg/text@1']['input'] | null;
       readonly codmUid: CodecTypes['pg/text@1']['input'];
       readonly codmUsername: CodecTypes['pg/text@1']['input'];
       readonly country: CodecTypes['pg/text@1']['input'];
@@ -503,6 +505,7 @@ export type StorageColumnTypes = {
       readonly adminNotes: CodecTypes['pg/text@1']['output'] | null;
       readonly approvedById: CodecTypes['pg/text@1']['output'] | null;
       readonly clanId: CodecTypes['pg/text@1']['output'];
+      readonly codmClass: CodecTypes['pg/text@1']['output'] | null;
       readonly codmUid: CodecTypes['pg/text@1']['output'];
       readonly codmUsername: CodecTypes['pg/text@1']['output'];
       readonly country: CodecTypes['pg/text@1']['output'];
@@ -619,6 +622,7 @@ export type StorageColumnInputTypes = {
       readonly adminNotes: CodecTypes['pg/text@1']['input'] | null;
       readonly approvedById: CodecTypes['pg/text@1']['input'] | null;
       readonly clanId: CodecTypes['pg/text@1']['input'];
+      readonly codmClass: CodecTypes['pg/text@1']['input'] | null;
       readonly codmUid: CodecTypes['pg/text@1']['input'];
       readonly codmUsername: CodecTypes['pg/text@1']['input'];
       readonly country: CodecTypes['pg/text@1']['input'];
@@ -742,6 +746,7 @@ export namespace Models {
     adminNotes: CodecTypes['pg/text@1']['output'] | null;
     approvedById: CodecTypes['pg/text@1']['output'] | null;
     clanId: CodecTypes['pg/text@1']['output'];
+    codmClass: CodecTypes['pg/text@1']['output'] | null;
     codmUid: CodecTypes['pg/text@1']['output'];
     codmUsername: CodecTypes['pg/text@1']['output'];
     country: CodecTypes['pg/text@1']['output'];
@@ -1009,6 +1014,11 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                };
+                readonly codmClass: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                 };
                 readonly codmUid: {
                   readonly nativeType: 'text';
@@ -1936,6 +1946,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly codmClass: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly codmUid: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -2080,6 +2094,7 @@ type ContractBase = Omit<
                 readonly adminNotes: { readonly column: 'adminNotes' };
                 readonly approvedById: { readonly column: 'approvedById' };
                 readonly clanId: { readonly column: 'clanId' };
+                readonly codmClass: { readonly column: 'codmClass' };
                 readonly codmUid: { readonly column: 'codmUid' };
                 readonly codmUsername: { readonly column: 'codmUsername' };
                 readonly country: { readonly column: 'country' };
