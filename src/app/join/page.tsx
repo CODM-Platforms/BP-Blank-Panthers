@@ -84,13 +84,11 @@ export default function TacticalJoinPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span>
               </span>
-              <span className="font-label-sm text-label-sm tracking-widest text-primary-container uppercase">OPEN ENROLLMENT</span>
-              <span className="text-outline text-body-sm font-body-sm opacity-40">/</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant uppercase font-mono tracking-wider">PROTOCOL S24.7</span>
+              <span className="font-label-sm text-label-sm tracking-widest text-primary-container uppercase">RECRUITMENT OPEN</span>
             </div>
             <Link href="/" className="font-label-sm text-label-sm tracking-widest uppercase text-outline hover:text-on-surface flex items-center gap-1 transition-colors">
               <span className="material-symbols-outlined text-[14px]">arrow_back</span>
-              Abort sequence
+              Back to Home
             </Link>
           </div>
 
@@ -101,14 +99,14 @@ export default function TacticalJoinPage() {
               
               <div className="flex flex-col gap-space-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono">SYS.ID: 9912-REQ-FORM</span>
-                  <span className="font-label-sm text-label-sm px-space-sm py-0.5 rounded bg-surface-container-high text-primary-container font-mono">CODM // TOURNAMENT READY</span>
+                  <span className="font-label-sm text-label-sm tracking-widest text-outline uppercase font-mono">CLAN RECRUITMENT</span>
+                  <span className="font-label-sm text-label-sm px-space-sm py-0.5 rounded bg-surface-container-high text-primary-container font-mono">{CLAN_TAG} // CODM</span>
                 </div>
                 <h1 className="font-headline-md text-headline-md uppercase text-on-surface tracking-tight flex items-center gap-space-xs mt-2">
-                  Combine Dossier
+                  Join BP Black Panthers
                 </h1>
                 <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                  Submit your tactical credentials to initialize the BP Black Panthers recruitment sequence.
+                  Fill in your player details below to apply for the BP Black Panthers roster.
                 </p>
               </div>
 
@@ -309,11 +307,11 @@ export default function TacticalJoinPage() {
                 <div className="pt-space-md">
                   <button type="submit" disabled={isSubmitting} className="group w-full py-space-md px-space-lg rounded-lg bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] text-on-primary-container font-headline-sm text-headline-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(255,59,59,0.2)] hover:shadow-[0_0_32px_rgba(255,59,59,0.35)] disabled:opacity-50">
                     <span className="material-symbols-outlined text-[20px]">{isSubmitting ? 'hourglass_empty' : 'how_to_reg'}</span>
-                    <span>{isSubmitting ? 'TRANSMITTING...' : 'Submit Combine Dossier'}</span>
+                    <span>{isSubmitting ? 'Submitting...' : 'Join the Clan'}</span>
                     {!isSubmitting && <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">arrow_forward</span>}
                   </button>
                   <p className="text-center font-body-sm text-body-sm text-outline mt-space-sm">
-                    Initialization implies compliance with <a href="/#rules" className="text-primary-container hover:underline">BP Tactical Directives</a>.
+                    Applying requires following the <Link href="/rules" className="text-primary-container hover:underline">BP Black Panthers Clan Rules</Link>.
                   </p>
                 </div>
 
