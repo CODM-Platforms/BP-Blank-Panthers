@@ -346,3 +346,158 @@ export async function deleteTournament(tournamentId: string) {
   revalidatePath('/tournaments');
   redirect('/admin/tournaments');
 }
+
+export async function createTournamentTeam(tournamentId: string, name: string) {
+  const actor = await getSessionUser();
+  if (!actor) throw new Error('Not authorized');
+
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error('Team name is required');
+
+  await db.orm.public.Team.create({
+    tournamentId,
+    name: trimmed,
+  });
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
+export async function deleteTournamentTeam(teamId: string, tournamentId: string) {
+  const actor = await getSessionUser();
+  if (!actor) throw new Error('Not authorized');
+
+  await db.orm.public.Participant.where({ teamId }).update({ teamId: null, seatNumber: null });
+  await db.orm.public.Team.where({ id: teamId }).delete();
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
+export async function assignPlayerToTeam(participantId: string, teamId: string | null, tournamentId: string) {
+  const actor = await getSessionUser();
+  if (!actor) throw new Error('Not authorized');
+
+  if (teamId) {
+    const existing = await db.orm.public.Participant.where({ teamId }).all();
+    const nextSeat = existing.length + 1;
+    await db.orm.public.Participant.where({ id: participantId }).update({
+      teamId,
+      seatNumber: nextSeat,
+    });
+  } else {
+    await db.orm.public.Participant.where({ id: participantId }).update({
+      teamId: null,
+      seatNumber: null,
+    });
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
+export async function addMemberDirectlyToTeam(tournamentId: string, memberId: string, teamId: string) {
+  const actor = await getSessionUser();
+  if (!actor) throw new Error('Not authorized');
+
+  let participant = await db.orm.public.Participant
+    .where({ tournamentId, memberId })
+    .first();
+
+  const existingTeamMembers = await db.orm.public.Participant.where({ teamId }).all();
+  const seatNumber = existingTeamMembers.length + 1;
+
+  if (!participant) {
+    await db.orm.public.Participant.create({
+      tournamentId,
+      memberId,
+      attendanceStatus: 'CONFIRMED',
+      secureToken: randomUUID(),
+      teamId,
+      seatNumber,
+    });
+
+    const member = await db.orm.public.Member.first({ id: memberId });
+    if (member) {
+      await db.orm.public.Member.where({ id: memberId }).update({
+        tournamentsInvited: member.tournamentsInvited + 1,
+        tournamentsConfirmed: member.tournamentsConfirmed + 1,
+      });
+    }
+  } else {
+    await db.orm.public.Participant.where({ id: participant.id }).update({
+      teamId,
+      seatNumber,
+      attendanceStatus: participant.attendanceStatus === 'DECLINED' ? 'CONFIRMED' : participant.attendanceStatus,
+    });
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
+export async function autoGenerateTournamentTeams(tournamentId: string) {
+  const actor = await getSessionUser();
+  if (!actor) throw new Error('Not authorized');
+
+  const tournament = await db.orm.public.Tournament.first({ id: tournamentId });
+  if (!tournament) throw new Error('Tournament not found');
+
+  const participants = await db.orm.public.Participant
+    .where({ tournamentId })
+    .where((p) => p.teamId.isNull())
+    .all();
+
+  if (participants.length === 0) {
+    throw new Error('No unassigned players to form squads.');
+  }
+
+  const shuffled = [...participants].sort(() => Math.random() - 0.5);
+  const teamSize = tournament.teamSize || 3;
+  const teamPresets = [
+    'TEAM ALPHA', 'TEAM BETA', 'TEAM GAMMA', 'TEAM DELTA',
+    'TEAM EPSILON', 'TEAM ZETA', 'TEAM ETA', 'TEAM THETA',
+    'TEAM IOTA', 'TEAM KAPPA', 'TEAM LAMBDA', 'TEAM SIGMA'
+  ];
+
+  const existingTeams = await db.orm.public.Team.where({ tournamentId }).all();
+  let nameIndex = existingTeams.length;
+
+  for (let i = 0; i < shuffled.length; i += teamSize) {
+    const squad = shuffled.slice(i, i + teamSize);
+    const teamName = teamPresets[nameIndex] || `SQUAD ${nameIndex + 1}`;
+    nameIndex++;
+
+    const team = await db.orm.public.Team.create({
+      tournamentId,
+      name: teamName,
+    });
+
+    for (let seat = 0; seat < squad.length; seat++) {
+      await db.orm.public.Participant.where({ id: squad[seat].id }).update({
+        teamId: team.id,
+        seatNumber: seat + 1,
+      });
+    }
+  }
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
+
+export async function resetTournamentTeams(tournamentId: string) {
+  const actor = await getSessionUser();
+  if (!actor) throw new Error('Not authorized');
+
+  await db.orm.public.Participant.where({ tournamentId }).update({ teamId: null, seatNumber: null });
+  await db.orm.public.Team.where({ tournamentId }).delete();
+
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath(`/admin/tournaments/${tournamentId}/teams`);
+  revalidatePath(`/tournaments/${tournamentId}`);
+}
