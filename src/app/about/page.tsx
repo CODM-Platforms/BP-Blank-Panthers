@@ -20,7 +20,7 @@ export default async function AboutPage() {
   try {
     clanLeaders = await loadClanLeaders();
   } catch (e) {
-    console.error('DB not connected yet.');
+    console.error('About DB query error:', e);
   }
 
   return (

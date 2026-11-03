@@ -50,20 +50,15 @@ export default async function Home() {
   let completedTournamentsCount = 0;
 
   try {
-    const [tournaments, posts, spotlight, activeMembers, completedTournaments] = await Promise.all([
-      loadActiveTournaments(),
-      loadRecentPosts(),
-      loadSpotlightTournament(),
-      db.orm.public.Member.where({ status: 'ACTIVE' }).all(),
-      db.orm.public.Tournament.where({ status: 'COMPLETED' }).all(),
-    ]);
-    activeTournaments = tournaments;
-    recentPosts = posts;
-    spotlightTournament = spotlight;
+    activeTournaments = await loadActiveTournaments();
+    recentPosts = await loadRecentPosts();
+    spotlightTournament = await loadSpotlightTournament();
+    const activeMembers = await db.orm.public.Member.where({ status: 'ACTIVE' }).all();
     activeMembersCount = activeMembers.length;
+    const completedTournaments = await db.orm.public.Tournament.where({ status: 'COMPLETED' }).all();
     completedTournamentsCount = completedTournaments.length;
   } catch (e) {
-    console.error('DB not connected yet.');
+    console.error('Home DB query error:', e);
   }
 
   return (
