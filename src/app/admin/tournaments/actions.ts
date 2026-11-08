@@ -194,7 +194,41 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
 
   const statusAction = (formData.get('status_action') as string) || 'ongoing';
   const teams = await db.orm.public.Team.where({ tournamentId }).all();
+  const participants = await db.orm.public.Participant.where({ tournamentId }).all();
 
+  // 1. Update individual player kills and sum kills per team
+  const teamPlayerKillsSum = new Map<string, number>();
+
+  for (const participant of participants) {
+    const baseKillsRaw = formData.get(`player_kills_${participant.id}`) as string;
+    const addKillsRaw = formData.get(`add_player_kills_${participant.id}`) as string;
+
+    const hasInput = baseKillsRaw !== null || addKillsRaw !== null;
+    const baseKills =
+      baseKillsRaw !== '' && baseKillsRaw !== null
+        ? Number(baseKillsRaw)
+        : (participant.kills ?? 0);
+    const addKills = addKillsRaw ? Number(addKillsRaw) : 0;
+    const updatedKills = Math.max(
+      0,
+      (isNaN(baseKills) ? 0 : baseKills) + (isNaN(addKills) ? 0 : addKills)
+    );
+
+    if (hasInput && updatedKills !== (participant.kills ?? 0)) {
+      await db.orm.public.Participant.where({ id: participant.id }).update({
+        kills: updatedKills,
+      });
+    }
+
+    if (participant.teamId) {
+      teamPlayerKillsSum.set(
+        participant.teamId,
+        (teamPlayerKillsSum.get(participant.teamId) ?? 0) + updatedKills
+      );
+    }
+  }
+
+  // 2. Update team points, kills, and placements
   const teamUpdates: Array<{
     id: string;
     placement: number | null;
@@ -212,14 +246,17 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
     const addPoints = addPointsRaw ? Number(addPointsRaw) : 0;
     const totalPoints = Math.max(0, (isNaN(basePoints) ? 0 : basePoints) + (isNaN(addPoints) ? 0 : addPoints));
 
-    const totalKills = killsRaw !== '' && killsRaw !== null ? Number(killsRaw) : (team.totalKills ?? 0);
+    const manualTeamKills = killsRaw !== '' && killsRaw !== null ? Number(killsRaw) : (team.totalKills ?? 0);
+    const summedPlayerKills = teamPlayerKillsSum.get(team.id) ?? 0;
+    // If players in this squad have recorded kills, auto-sum their kills into the team total (unless manual override is higher)
+    const totalKills = summedPlayerKills > 0 ? summedPlayerKills : (isNaN(manualTeamKills) ? 0 : manualTeamKills);
     const placement = placementRaw ? Number(placementRaw) : null;
 
     teamUpdates.push({
       id: team.id,
       placement,
       totalPoints,
-      totalKills: isNaN(totalKills) ? 0 : totalKills,
+      totalKills,
     });
   }
 
@@ -250,7 +287,7 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
 
   await db.orm.public.AuditLog.create({
     action: newStatus === 'COMPLETED' ? 'TOURNAMENT_COMPLETED' : 'TOURNAMENT_SCORES_UPDATED',
-    details: `Scores updated for tournament ${tournamentId} (Status set to: ${newStatus}) by ${actor.name} (${actor.id}).`,
+    details: `Scores and player kills updated for tournament ${tournamentId} (Status set to: ${newStatus}) by ${actor.name} (${actor.id}).`,
     userId: actor.id,
   });
 

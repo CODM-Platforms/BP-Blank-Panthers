@@ -647,6 +647,13 @@
                   "kind": "scalar"
                 }
               },
+              "kills": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "memberId": {
                 "nullable": false,
                 "type": {
@@ -756,6 +763,9 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "kills": {
+                  "column": "kills"
                 },
                 "memberId": {
                   "column": "memberId"
@@ -2057,6 +2067,15 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "kills": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "0",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "memberId": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -2801,7 +2820,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "879f4f666a567bf15a6803921f781ccaccecdb84f59cd608eeedfd5446f20c13"
+    "storageHash": "68ce4f1ffe82d8a964a3fc5ffb88fb7330594d894e4a74f5530eba3cc7f6fd2c"
   },
   "execution": {
     "executionHash": "89a20b8aea7a7a1a83e9af714c3cc81e79b2ede71ec9a792f92e52630a14d80f",

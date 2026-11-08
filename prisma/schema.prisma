@@ -194,6 +194,7 @@ model Participant {
   teamId             String?
   team               Team?            @relation(fields: [teamId], references: [id])
   seatNumber         Int?
+  kills              Int?             @default(dbgenerated("0"))
 
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt

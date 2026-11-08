@@ -162,6 +162,63 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
             </div>
           )}
 
+          {/* Player Kills Leaderboard (Top Fraggers Table) */}
+          {rosterParticipants.some((p: any) => (p.kills ?? 0) > 0) && (
+            <div className="flex flex-col gap-space-md mb-10">
+              <div className="flex items-center justify-between">
+                <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary-container">local_fire_department</span>
+                  Top Players by Kills (Kill Leaderboard)
+                </h2>
+                <span className="text-xs font-mono text-outline uppercase">Individual Fraggers</span>
+              </div>
+
+              <div className="bg-surface-container-low/80 border border-surface-container-high rounded-xl overflow-hidden">
+                <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-surface-container-highest/60 border-b border-surface-container-high text-[11px] font-mono uppercase tracking-wider text-outline font-bold">
+                  <div className="col-span-2 sm:col-span-1">Rank</div>
+                  <div className="col-span-5 sm:col-span-6">Player</div>
+                  <div className="col-span-3">Squad</div>
+                  <div className="col-span-2 text-right">Kills</div>
+                </div>
+                <div className="divide-y divide-surface-container-high/50">
+                  {[...rosterParticipants]
+                    .sort((a: any, b: any) => (b.kills ?? 0) - (a.kills ?? 0))
+                    .map((p: any, idx: number) => {
+                      const isTopFragger = idx === 0 && (p.kills ?? 0) > 0;
+                      return (
+                        <div
+                          key={p.id}
+                          className={`grid grid-cols-12 gap-2 px-4 py-3 items-center font-mono text-sm ${
+                            isTopFragger ? 'bg-primary-container/10' : 'hover:bg-surface-container-high/30'
+                          }`}
+                        >
+                          <div className="col-span-2 sm:col-span-1 font-bold">
+                            <span className={isTopFragger ? 'text-primary-container' : idx === 1 ? 'text-zinc-300' : idx === 2 ? 'text-amber-600' : 'text-outline'}>
+                              #{idx + 1}
+                            </span>
+                          </div>
+                          <div className="col-span-5 sm:col-span-6 flex items-center gap-2 truncate">
+                            <span className="text-on-surface font-bold truncate">{p.member?.codmUsername}</span>
+                            {isTopFragger && (
+                              <span className="hidden sm:inline-block px-1.5 py-0.5 bg-primary-container/20 text-primary-container border border-primary-container/40 text-[10px] rounded uppercase font-bold">
+                                🔥 Top Fragger
+                              </span>
+                            )}
+                          </div>
+                          <div className="col-span-3 text-xs text-outline truncate uppercase">
+                            {p.team?.name || 'Unassigned'}
+                          </div>
+                          <div className="col-span-2 text-right font-bold text-primary-container">
+                            🎯 {p.kills ?? 0}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Confirmed Squads & Lineups */}
           <div className="flex flex-col gap-space-md">
             <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface flex items-center gap-2">
@@ -180,9 +237,16 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         {members.map((p: any) => (
-                          <span key={p.id} className="px-2.5 py-1 bg-surface-container-highest border border-surface-container-high rounded font-mono text-xs text-on-surface">
-                            {p.member?.codmUsername}
-                            {p.member?.codmClass ? ` (${p.member.codmClass})` : ''}
+                          <span key={p.id} className="px-2.5 py-1 bg-surface-container-highest border border-surface-container-high rounded font-mono text-xs text-on-surface flex items-center gap-1.5">
+                            <span>
+                              {p.member?.codmUsername}
+                              {p.member?.codmClass ? ` (${p.member.codmClass})` : ''}
+                            </span>
+                            {(p.kills ?? 0) > 0 && (
+                              <span className="text-[10px] text-primary-container font-bold bg-primary-container/10 px-1.5 py-0.5 rounded">
+                                🎯 {p.kills}
+                              </span>
+                            )}
                           </span>
                         ))}
                       </div>

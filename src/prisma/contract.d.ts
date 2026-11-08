@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'879f4f666a567bf15a6803921f781ccaccecdb84f59cd608eeedfd5446f20c13'>;
+  StorageHashBase<'68ce4f1ffe82d8a964a3fc5ffb88fb7330594d894e4a74f5530eba3cc7f6fd2c'>;
 export type ExecutionHash =
   ExecutionHashBase<'89a20b8aea7a7a1a83e9af714c3cc81e79b2ede71ec9a792f92e52630a14d80f'>;
 export type ProfileHash =
@@ -299,6 +299,7 @@ export type FieldOutputTypes = {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly declineReason: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
+      readonly kills: CodecTypes['pg/int4@1']['output'] | null;
       readonly memberId: CodecTypes['pg/text@1']['output'];
       readonly seatNumber: CodecTypes['pg/int4@1']['output'] | null;
       readonly secureToken: CodecTypes['pg/text@1']['output'];
@@ -416,6 +417,7 @@ export type FieldInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly declineReason: CodecTypes['pg/text@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
+      readonly kills: CodecTypes['pg/int4@1']['input'] | null;
       readonly memberId: CodecTypes['pg/text@1']['input'];
       readonly seatNumber: CodecTypes['pg/int4@1']['input'] | null;
       readonly secureToken: CodecTypes['pg/text@1']['input'];
@@ -533,6 +535,7 @@ export type StorageColumnTypes = {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
       readonly declineReason: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/text@1']['output'];
+      readonly kills: CodecTypes['pg/int4@1']['output'] | null;
       readonly memberId: CodecTypes['pg/text@1']['output'];
       readonly seatNumber: CodecTypes['pg/int4@1']['output'] | null;
       readonly secureToken: CodecTypes['pg/text@1']['output'];
@@ -650,6 +653,7 @@ export type StorageColumnInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamp-temporal@1']['input'];
       readonly declineReason: CodecTypes['pg/text@1']['input'] | null;
       readonly id: CodecTypes['pg/text@1']['input'];
+      readonly kills: CodecTypes['pg/int4@1']['input'] | null;
       readonly memberId: CodecTypes['pg/text@1']['input'];
       readonly seatNumber: CodecTypes['pg/int4@1']['input'] | null;
       readonly secureToken: CodecTypes['pg/text@1']['input'];
@@ -778,6 +782,7 @@ export namespace Models {
     createdAt: CodecTypes['pg/timestamp-temporal@1']['output'];
     declineReason: CodecTypes['pg/text@1']['output'] | null;
     id: CodecTypes['pg/text@1']['output'];
+    kills: CodecTypes['pg/int4@1']['output'] | null;
     memberId: CodecTypes['pg/text@1']['output'];
     seatNumber: CodecTypes['pg/int4@1']['output'] | null;
     secureToken: CodecTypes['pg/text@1']['output'];
@@ -1209,6 +1214,12 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                };
+                readonly kills: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly default: { readonly kind: 'function'; readonly expression: '0' };
                 };
                 readonly memberId: {
                   readonly nativeType: 'text';
@@ -2144,6 +2155,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly kills: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
               readonly memberId: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -2216,6 +2231,7 @@ type ContractBase = Omit<
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly declineReason: { readonly column: 'declineReason' };
                 readonly id: { readonly column: 'id' };
+                readonly kills: { readonly column: 'kills' };
                 readonly memberId: { readonly column: 'memberId' };
                 readonly seatNumber: { readonly column: 'seatNumber' };
                 readonly secureToken: { readonly column: 'secureToken' };
