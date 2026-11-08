@@ -214,7 +214,7 @@ export default async function TournamentControlCenter({ params }: { params: { id
                 <span className="material-symbols-outlined text-primary-container">emoji_events</span> Match Scores &amp; Player Kills
               </h2>
               <p className="text-sm text-outline mt-1">
-                Enter squad points and individual player kills after each match day. Squad total kills and leaderboard rankings calculate automatically.
+                Enter each player&apos;s <b>+ Today Kills</b> (automatically adds +1 pt per kill to Team Total Points &amp; Team Kills) and any <b>+ Win / Bonus Pts (Today)</b>. Squad Ranks (#1–#4) re-calculate automatically.
               </p>
             </div>
             <div className="flex items-center gap-2 self-start md:self-auto">
@@ -267,11 +267,11 @@ export default async function TournamentControlCenter({ params }: { params: { id
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-outline uppercase block mb-1">+ Add Points (Today)</label>
+                      <label className="text-xs text-outline uppercase block mb-1">+ Win / Bonus Pts (Today)</label>
                       <input
                         type="number"
                         name={`add_points_${team.id}`}
-                        placeholder="+0"
+                        placeholder="+0 (Win: 3, 2nd: 1)"
                         className="w-full bg-surface-container-high/60 border border-surface-container-high rounded px-3 py-2 text-primary-container placeholder-outline/50 text-sm font-mono focus:outline-none focus:border-primary-container"
                       />
                     </div>
@@ -286,14 +286,12 @@ export default async function TournamentControlCenter({ params }: { params: { id
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-outline uppercase block mb-1">Placement / Rank</label>
+                      <label className="text-xs text-outline uppercase block mb-1">Placement / Rank (Auto)</label>
                       <input
-                        type="number"
-                        name={`placement_${team.id}`}
-                        min={1}
-                        defaultValue={team.placement ?? ''}
-                        placeholder="Auto (or 1, 2...)"
-                        className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm font-mono focus:outline-none focus:border-primary-container"
+                        type="text"
+                        readOnly
+                        value={team.placement ? `#${team.placement} (Auto by Points)` : 'Auto by Points'}
+                        className="w-full bg-surface-container-high/40 border border-surface-container-high rounded px-3 py-2 text-outline text-sm font-mono cursor-not-allowed"
                       />
                     </div>
                   </div>

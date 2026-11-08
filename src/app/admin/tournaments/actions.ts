@@ -198,6 +198,7 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
 
   // 1. Update individual player kills and sum kills per team
   const teamPlayerKillsSum = new Map<string, number>();
+  const teamTodayAddedKillsSum = new Map<string, number>();
 
   for (const participant of participants) {
     const baseKillsRaw = formData.get(`player_kills_${participant.id}`) as string;
@@ -209,9 +210,10 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
         ? Number(baseKillsRaw)
         : (participant.kills ?? 0);
     const addKills = addKillsRaw ? Number(addKillsRaw) : 0;
+    const safeAddKills = isNaN(addKills) ? 0 : addKills;
     const updatedKills = Math.max(
       0,
-      (isNaN(baseKills) ? 0 : baseKills) + (isNaN(addKills) ? 0 : addKills)
+      (isNaN(baseKills) ? 0 : baseKills) + safeAddKills
     );
 
     if (hasInput && updatedKills !== (participant.kills ?? 0)) {
@@ -225,10 +227,14 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
         participant.teamId,
         (teamPlayerKillsSum.get(participant.teamId) ?? 0) + updatedKills
       );
+      teamTodayAddedKillsSum.set(
+        participant.teamId,
+        (teamTodayAddedKillsSum.get(participant.teamId) ?? 0) + safeAddKills
+      );
     }
   }
 
-  // 2. Update team points, kills, and placements
+  // 2. Update team points (including 1 pt per today's player kill + bonus/win pts), kills, and auto-placements
   const teamUpdates: Array<{
     id: string;
     placement: number | null;
@@ -237,42 +243,41 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
   }> = [];
 
   for (const team of teams) {
-    const placementRaw = formData.get(`placement_${team.id}`) as string;
     const pointsRaw = formData.get(`points_${team.id}`) as string;
     const killsRaw = formData.get(`kills_${team.id}`) as string;
     const addPointsRaw = formData.get(`add_points_${team.id}`) as string;
 
     const basePoints = pointsRaw !== '' && pointsRaw !== null ? Number(pointsRaw) : (team.totalPoints ?? 0);
-    const addPoints = addPointsRaw ? Number(addPointsRaw) : 0;
-    const totalPoints = Math.max(0, (isNaN(basePoints) ? 0 : basePoints) + (isNaN(addPoints) ? 0 : addPoints));
+    const addBonusPoints = addPointsRaw ? Number(addPointsRaw) : 0;
+    const todayKillsPoints = teamTodayAddedKillsSum.get(team.id) ?? 0;
+
+    const totalPoints = Math.max(
+      0,
+      (isNaN(basePoints) ? 0 : basePoints) +
+        (isNaN(addBonusPoints) ? 0 : addBonusPoints) +
+        todayKillsPoints
+    );
 
     const manualTeamKills = killsRaw !== '' && killsRaw !== null ? Number(killsRaw) : (team.totalKills ?? 0);
     const summedPlayerKills = teamPlayerKillsSum.get(team.id) ?? 0;
-    // If players in this squad have recorded kills, auto-sum their kills into the team total (unless manual override is higher)
     const totalKills = summedPlayerKills > 0 ? summedPlayerKills : (isNaN(manualTeamKills) ? 0 : manualTeamKills);
-    const placement = placementRaw ? Number(placementRaw) : null;
 
     teamUpdates.push({
       id: team.id,
-      placement,
+      placement: null,
       totalPoints,
       totalKills,
     });
   }
 
-  // Auto-calculate placement by descending points if not all manually set
-  const hasManualPlacements = teamUpdates.every((t) => t.placement !== null && t.placement > 0);
-  if (!hasManualPlacements) {
-    const sorted = [...teamUpdates].sort((a, b) => {
-      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
-      return b.totalKills - a.totalKills;
-    });
-    sorted.forEach((teamUpdate, index) => {
-      if (!teamUpdate.placement) {
-        teamUpdate.placement = index + 1;
-      }
-    });
-  }
+  // Always auto-rank teams #1, #2, #3, #4 by descending totalPoints (and totalKills tiebreaker)
+  const sorted = [...teamUpdates].sort((a, b) => {
+    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+    return b.totalKills - a.totalKills;
+  });
+  sorted.forEach((teamUpdate, index) => {
+    teamUpdate.placement = index + 1;
+  });
 
   for (const update of teamUpdates) {
     await db.orm.public.Team.where({ id: update.id }).update({
