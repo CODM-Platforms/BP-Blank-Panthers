@@ -34,3 +34,4 @@ export default function ClanBackground({ variant = 'default' }: ClanBackgroundPr
     </div>
   );
 }
+
