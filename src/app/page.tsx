@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
+import ClanBackground from '@/components/ClanBackground';
 import { db } from '@/prisma/db';
 import { toJsDate } from '@/lib/temporal';
 import { CLAN_TAG } from '@/config/clan';
@@ -64,17 +65,7 @@ export default async function Home() {
   return (
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
       {/* Background Graphic */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30 filter contrast-125 saturate-50 scale-105"
-          style={{
-            backgroundImage:
-              "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB-9rTGcur1BRSQSmqEmNfM2OrWE8PDOIgAweVjC7yOz6s6kHmLE08ElDVIdVTG-HLfn7RBP-Lw6rCqPYQTtI4SXgeQ0pwzZoEXAYOBzZqSgtWHyqqXy8xgIDy9RZ5wEA7Ud5Jv_sr720Ar2MgacpEkAOxurNZa4cRB3AgShwrQ_wgfY7Vi8kD3N5OIi8pAofbKAyW5aIstNUSjtjP-4msTYr6P0hmJA8e6Kes8MN-PvtiZIZlmjn7lng')",
-          }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/90 via-surface-container-lowest/80 to-surface-container-lowest/95 backdrop-blur-[4px]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0c0e12_85%)]"></div>
-      </div>
+      <ClanBackground />
 
       {/* Header */}
       <GlobalHeader />

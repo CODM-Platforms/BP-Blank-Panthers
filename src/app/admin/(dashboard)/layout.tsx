@@ -1,6 +1,7 @@
 
 import Link from 'next/link';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import ClanBackground from '@/components/ClanBackground';
 import { getSessionUser } from '@/lib/session';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -10,11 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col md:flex-row font-sans selection:bg-primary-container selection:text-on-primary-container relative overflow-hidden">
       
       {/* Background Graphic */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 bg-cover bg-center opacity-10 filter contrast-125 saturate-50 scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB-9rTGcur1BRSQSmqEmNfM2OrWE8PDOIgAweVjC7yOz6s6kHmLE08ElDVIdVTG-HLfn7RBP-Lw6rCqPYQTtI4SXgeQ0pwzZoEXAYOBzZqSgtWHyqqXy8xgIDy9RZ5wEA7Ud5Jv_sr720Ar2MgacpEkAOxurNZa4cRB3AgShwrQ_wgfY7Vi8kD3N5OIi8pAofbKAyW5aIstNUSjtjP-4msTYr6P0hmJA8e6Kes8MN-PvtiZIZlmjn7lng')" }}></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/95 via-surface-container-lowest/90 to-surface-container-lowest/95 backdrop-blur-[2px]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0c0e12_85%)]"></div>
-      </div>
+      <ClanBackground variant="subtle" />
 
       {/* Sidebar */}
       <aside className="w-72 bg-surface-container-lowest/80 backdrop-blur-xl border-r border-surface-container-high/50 hidden md:flex flex-col relative z-20">

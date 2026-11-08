@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
+import ClanBackground from '@/components/ClanBackground';
 import { db } from '@/prisma/db';
 import { notFound } from 'next/navigation';
 import { toJsDate } from '@/lib/temporal';
@@ -21,6 +22,7 @@ export default async function NewsPost({ params }: { params: { id: string } }) {
 
   return (
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col relative overflow-x-hidden">
+      <ClanBackground />
       <GlobalHeader />
 
       <main className="relative z-10 w-full flex-1 flex flex-col items-center pt-10 pb-margin">

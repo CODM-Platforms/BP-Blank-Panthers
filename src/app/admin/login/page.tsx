@@ -1,5 +1,6 @@
 'use client';
 import GlobalHeader from '@/components/GlobalHeader';
+import ClanBackground from '@/components/ClanBackground';
 import Link from 'next/link';
 
 import { useState } from 'react';
@@ -29,18 +30,12 @@ export default function TacticalAdminLogin() {
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col justify-between relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
       
       {/* Background Graphic */}
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(12,14,18,0.92)_85%,#0c0e12_100%)]"></div>
+      <ClanBackground />
       
       <GlobalHeader />
 
       <main className="relative z-10 w-full flex-1 flex items-center justify-center px-margin-mobile py-space-xl">
         <div className="flex flex-col w-full relative items-center justify-center py-space-md">
-          
-          <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center">
-            <div className="absolute inset-0 bg-cover bg-center opacity-30 filter contrast-125 saturate-50 scale-105" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB-9rTGcur1BRSQSmqEmNfM2OrWE8PDOIgAweVjC7yOz6s6kHmLE08ElDVIdVTG-HLfn7RBP-Lw6rCqPYQTtI4SXgeQ0pwzZoEXAYOBzZqSgtWHyqqXy8xgIDy9RZ5wEA7Ud5Jv_sr720Ar2MgacpEkAOxurNZa4cRB3AgShwrQ_wgfY7Vi8kD3N5OIi8pAofbKAyW5aIstNUSjtjP-4msTYr6P0hmJA8e6Kes8MN-PvtiZIZlmjn7lng')" }}></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/90 via-surface-container-lowest/80 to-surface-container-lowest/95 backdrop-blur-[6px]"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0c0e12_85%)]"></div>
-          </div>
 
           <div className="relative z-10 w-full max-w-xl mx-auto flex flex-col gap-space-lg">
             

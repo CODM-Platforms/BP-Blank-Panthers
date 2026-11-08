@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
+import ClanBackground from '@/components/ClanBackground';
 import { db } from '@/prisma/db';
 import { notFound } from 'next/navigation';
 import { toJsDate } from '@/lib/temporal';
@@ -29,10 +30,7 @@ export default async function PlayerStats({ params }: { params: { codmUsername: 
 
   return (
     <div className="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/95 via-surface-container-lowest/90 to-surface-container-lowest/95"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0c0e12_85%)]"></div>
-      </div>
+      <ClanBackground />
 
       <GlobalHeader />
 
