@@ -60,7 +60,7 @@ export default async function EditTournament({ params }: { params: { id: string 
               <input type="text" name="name" required defaultValue={tournament.name} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-outline mb-1">Game</label>
                 <input type="text" defaultValue="Call of Duty Mobile" disabled className="w-full bg-surface-container-lowest/50 border border-surface-container-high rounded-lg px-4 py-3 text-outline cursor-not-allowed" />
@@ -76,6 +76,16 @@ export default async function EditTournament({ params }: { params: { id: string 
                   </select>
                 </div>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-outline mb-1">Status</label>
+                <select name="status" defaultValue={tournament.status} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors appearance-none">
+                  <option value="DRAFT">Draft</option>
+                  <option value="PUBLISHED">Published (Upcoming)</option>
+                  <option value="ONGOING">Ongoing (Live Matches)</option>
+                  <option value="COMPLETED">Completed (Finalized)</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -88,6 +98,7 @@ export default async function EditTournament({ params }: { params: { id: string 
               <div>
                 <label className="block text-sm font-medium text-outline mb-1">Format (Team Size)</label>
                 <select name="teamSize" required defaultValue={String(tournament.teamSize)} className="w-full bg-surface-container-lowest border border-surface-container-high rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors appearance-none">
+                  <option value="3">Trio (3 Players - Resurgence)</option>
                   <option value="4">Squad (4 Players)</option>
                   <option value="5">Team (5 Players)</option>
                   <option value="2">Duo (2 Players)</option>

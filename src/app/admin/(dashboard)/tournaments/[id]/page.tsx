@@ -1,10 +1,10 @@
-import { Users, ShieldCheck, Download, Pencil } from 'lucide-react';
+import { Users, ShieldCheck, Download, Pencil, Play } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/prisma/db';
 import { toJsDate, sanitizeForClient } from '@/lib/temporal';
 import { getBaseUrl } from '@/lib/url';
-import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete, autoProgressAttendance } from '@/app/admin/tournaments/actions';
+import { publishTournament, cancelTournament, inviteMembersToTournament, saveResultsAndComplete, autoProgressAttendance, setTournamentStatus } from '@/app/admin/tournaments/actions';
 import TournamentParticipants from '@/components/admin/TournamentParticipants';
 import TournamentPhotos from '@/components/admin/TournamentPhotos';
 import DeleteTournamentButton from '@/components/admin/DeleteTournamentButton';
@@ -101,6 +101,31 @@ export default async function TournamentControlCenter({ params }: { params: { id
               </button>
             </form>
           )}
+          {tournament.status === 'PUBLISHED' && (
+            <form action={async () => {
+              'use server';
+              await setTournamentStatus(tournament.id, 'ONGOING');
+            }}>
+              <button type="submit" className="px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg font-bold hover:bg-green-500/20 transition-colors flex items-center gap-2">
+                <Play className="w-4 h-4" /> Start (Set Ongoing)
+              </button>
+            </form>
+          )}
+          {tournament.status === 'COMPLETED' && (
+            <form action={async () => {
+              'use server';
+              await setTournamentStatus(tournament.id, 'ONGOING');
+            }}>
+              <button type="submit" className="px-4 py-2 bg-green-500/10 border border-green-500/30 text-green-400 rounded-lg font-bold hover:bg-green-500/20 transition-colors flex items-center gap-2">
+                <Play className="w-4 h-4" /> Reopen as Ongoing
+              </button>
+            </form>
+          )}
+          {tournament.status === 'ONGOING' && (
+            <div className="px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg font-bold text-xs uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Ongoing / Live Matches
+            </div>
+          )}
           {tournament.status !== 'CANCELLED' && tournament.status !== 'COMPLETED' && (
             <form action={doCancel}>
               <button type="submit" className="px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg font-bold hover:bg-red-500/20 transition-colors">
@@ -180,31 +205,119 @@ export default async function TournamentControlCenter({ params }: { params: { id
         </form>
       )}
 
-      {/* Enter Results */}
-      {tournament.teams.length > 0 && tournament.status !== 'COMPLETED' && tournament.status !== 'CANCELLED' && (
+      {/* Match Scores & Daily Standings */}
+      {tournament.teams.length > 0 && tournament.status !== 'CANCELLED' && (
         <form action={doSaveResults} className="bg-surface-container-low border border-surface-container-high rounded-xl p-6">
-          <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary-container">emoji_events</span> Enter Results
-          </h2>
-          <p className="text-sm text-outline mb-4">Set final placement and points for each squad, then save to mark this tournament Completed. This is what shows on the public results page.</p>
-          <div className="space-y-3 mb-4">
-            {tournament.teams.map((team: any) => (
-              <div key={team.id} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center bg-surface-container-lowest border border-surface-container-high rounded-lg p-3">
-                <span className="text-on-surface font-bold truncate">{team.name}</span>
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-outline uppercase shrink-0">Placement</label>
-                  <input type="number" name={`placement_${team.id}`} min={1} defaultValue={team.placement ?? ''} placeholder="1st, 2nd..." className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm focus:outline-none focus:border-primary-container" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-outline uppercase shrink-0">Points</label>
-                  <input type="number" name={`points_${team.id}`} min={0} defaultValue={team.totalPoints ?? 0} className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm focus:outline-none focus:border-primary-container" />
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary-container">emoji_events</span> Match Scores &amp; Standings
+              </h2>
+              <p className="text-sm text-outline mt-1">
+                Enter or update marks after each match day. Totals and placements will update automatically on the leaderboard.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 self-start md:self-auto">
+              <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+                tournament.status === 'COMPLETED'
+                  ? 'bg-primary-container/10 border border-primary-container/30 text-primary-container'
+                  : 'bg-green-500/10 border border-green-500/30 text-green-400'
+              }`}>
+                {tournament.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>}
+                Status: {tournament.status}
+              </span>
+            </div>
           </div>
-          <button type="submit" className="px-6 py-2 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors">
-            Save Results &amp; Mark Completed
-          </button>
+
+          <div className="space-y-3 mb-6">
+            {tournament.teams.map((team: any) => {
+              const teamMembers = (tournament.participants ?? []).filter((p: any) => p.teamId === team.id);
+              return (
+                <div key={team.id} className="bg-surface-container-lowest border border-surface-container-high rounded-lg p-4 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-surface-container-high pb-2">
+                    <div>
+                      <span className="text-on-surface font-bold text-base uppercase tracking-wide">{team.name}</span>
+                      <p className="text-xs text-outline font-mono mt-0.5">
+                        Squad: {teamMembers.map((p: any) => p.member?.codmUsername).filter(Boolean).join(', ') || 'No players assigned'}
+                      </p>
+                    </div>
+                    {team.placement && (
+                      <span className="px-2 py-0.5 bg-surface-container-high text-primary-container font-mono text-xs rounded font-bold self-start sm:self-auto">
+                        Rank #{team.placement}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div>
+                      <label className="text-xs text-outline uppercase block mb-1">Total Points</label>
+                      <input
+                        type="number"
+                        name={`points_${team.id}`}
+                        min={0}
+                        defaultValue={team.totalPoints ?? 0}
+                        className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm font-mono focus:outline-none focus:border-primary-container"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-outline uppercase block mb-1">+ Add Points (Today)</label>
+                      <input
+                        type="number"
+                        name={`add_points_${team.id}`}
+                        placeholder="+0"
+                        className="w-full bg-surface-container-high/60 border border-surface-container-high rounded px-3 py-2 text-primary-container placeholder-outline/50 text-sm font-mono focus:outline-none focus:border-primary-container"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-outline uppercase block mb-1">Total Kills</label>
+                      <input
+                        type="number"
+                        name={`kills_${team.id}`}
+                        min={0}
+                        defaultValue={team.totalKills ?? 0}
+                        className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm font-mono focus:outline-none focus:border-primary-container"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-outline uppercase block mb-1">Placement / Rank</label>
+                      <input
+                        type="number"
+                        name={`placement_${team.id}`}
+                        min={1}
+                        defaultValue={team.placement ?? ''}
+                        placeholder="Auto (or 1, 2...)"
+                        className="w-full bg-surface-container-high border border-surface-container-high rounded px-3 py-2 text-on-surface text-sm font-mono focus:outline-none focus:border-primary-container"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-surface-container-high">
+            <p className="text-xs text-outline">
+              💡 <b>Match Day Tip:</b> Click <b>Save Scores (Keep Ongoing)</b> so today&apos;s scores update on the live standings while the tournament remains open for the next match day.
+            </p>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <button
+                type="submit"
+                name="status_action"
+                value="ongoing"
+                className="flex-1 sm:flex-initial px-5 py-2.5 bg-primary-container text-surface-container-lowest font-bold rounded-lg hover:bg-primary-fixed-dim transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,59,59,0.2)]"
+              >
+                💾 Save Scores (Keep Ongoing)
+              </button>
+              <button
+                type="submit"
+                name="status_action"
+                value="completed"
+                className="flex-1 sm:flex-initial px-4 py-2.5 bg-surface-container-high hover:bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                🏆 Finalize &amp; Complete
+              </button>
+            </div>
+          </div>
         </form>
       )}
 

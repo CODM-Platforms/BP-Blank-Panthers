@@ -192,21 +192,65 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
     throw new Error('Not authorized');
   }
 
+  const statusAction = (formData.get('status_action') as string) || 'ongoing';
   const teams = await db.orm.public.Team.where({ tournamentId }).all();
+
+  const teamUpdates: Array<{
+    id: string;
+    placement: number | null;
+    totalPoints: number;
+    totalKills: number;
+  }> = [];
+
   for (const team of teams) {
     const placementRaw = formData.get(`placement_${team.id}`) as string;
     const pointsRaw = formData.get(`points_${team.id}`) as string;
-    const placement = placementRaw ? Number(placementRaw) : null;
-    const totalPoints = pointsRaw ? Number(pointsRaw) : 0;
+    const killsRaw = formData.get(`kills_${team.id}`) as string;
+    const addPointsRaw = formData.get(`add_points_${team.id}`) as string;
 
-    await db.orm.public.Team.where({ id: team.id }).update({ placement, totalPoints });
+    const basePoints = pointsRaw !== '' && pointsRaw !== null ? Number(pointsRaw) : (team.totalPoints ?? 0);
+    const addPoints = addPointsRaw ? Number(addPointsRaw) : 0;
+    const totalPoints = Math.max(0, (isNaN(basePoints) ? 0 : basePoints) + (isNaN(addPoints) ? 0 : addPoints));
+
+    const totalKills = killsRaw !== '' && killsRaw !== null ? Number(killsRaw) : (team.totalKills ?? 0);
+    const placement = placementRaw ? Number(placementRaw) : null;
+
+    teamUpdates.push({
+      id: team.id,
+      placement,
+      totalPoints,
+      totalKills: isNaN(totalKills) ? 0 : totalKills,
+    });
   }
 
-  await db.orm.public.Tournament.where({ id: tournamentId }).update({ status: 'COMPLETED' });
+  // Auto-calculate placement by descending points if not all manually set
+  const hasManualPlacements = teamUpdates.every((t) => t.placement !== null && t.placement > 0);
+  if (!hasManualPlacements) {
+    const sorted = [...teamUpdates].sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+      return b.totalKills - a.totalKills;
+    });
+    sorted.forEach((teamUpdate, index) => {
+      if (!teamUpdate.placement) {
+        teamUpdate.placement = index + 1;
+      }
+    });
+  }
+
+  for (const update of teamUpdates) {
+    await db.orm.public.Team.where({ id: update.id }).update({
+      placement: update.placement,
+      totalPoints: update.totalPoints,
+      totalKills: update.totalKills,
+    });
+  }
+
+  const newStatus = statusAction === 'completed' ? 'COMPLETED' : 'ONGOING';
+  await db.orm.public.Tournament.where({ id: tournamentId }).update({ status: newStatus });
 
   await db.orm.public.AuditLog.create({
-    action: 'TOURNAMENT_RESULTS_SAVED',
-    details: `Results saved and tournament ${tournamentId} marked completed by ${actor.name} (${actor.id}).`,
+    action: newStatus === 'COMPLETED' ? 'TOURNAMENT_COMPLETED' : 'TOURNAMENT_SCORES_UPDATED',
+    details: `Scores updated for tournament ${tournamentId} (Status set to: ${newStatus}) by ${actor.name} (${actor.id}).`,
     userId: actor.id,
   });
 
@@ -215,7 +259,33 @@ export async function saveResultsAndComplete(tournamentId: string, formData: For
   revalidatePath(`/admin/tournaments/${tournamentId}`);
   revalidatePath('/tournaments');
   revalidatePath(`/tournaments/${tournamentId}`);
+  revalidatePath('/');
   redirect(`/admin/tournaments/${tournamentId}`);
+}
+
+export async function setTournamentStatus(
+  tournamentId: string,
+  status: 'DRAFT' | 'PUBLISHED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED'
+) {
+  const actor = await getSessionUser();
+  if (!actor) {
+    throw new Error('Not authorized');
+  }
+
+  await db.orm.public.Tournament.where({ id: tournamentId }).update({ status });
+
+  await db.orm.public.AuditLog.create({
+    action: 'TOURNAMENT_STATUS_UPDATED',
+    details: `Tournament ${tournamentId} status set to ${status} by ${actor.name} (${actor.id}).`,
+    userId: actor.id,
+  });
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/tournaments');
+  revalidatePath(`/admin/tournaments/${tournamentId}`);
+  revalidatePath('/tournaments');
+  revalidatePath(`/tournaments/${tournamentId}`);
+  revalidatePath('/');
 }
 
 export async function addTournamentPhoto(tournamentId: string, formData: FormData) {
@@ -286,6 +356,8 @@ export async function updateTournament(tournamentId: string, formData: FormData)
   const tournamentEnd = new Date(formData.get('tournamentEnd') as string);
   const registrationEnd = new Date(formData.get('registrationEnd') as string);
 
+  const statusRaw = formData.get('status') as string;
+
   if (!name || !mode || !teamSize || !maxPlayers || isNaN(tournamentDate.getTime()) || isNaN(tournamentEnd.getTime()) || isNaN(registrationEnd.getTime())) {
     throw new Error('Missing or invalid tournament fields.');
   }
@@ -293,7 +365,7 @@ export async function updateTournament(tournamentId: string, formData: FormData)
     throw new Error('End Time must be after Start Time.');
   }
 
-  await db.orm.public.Tournament.where({ id: tournamentId }).update({
+  const updatePayload: any = {
     name,
     mode: mode as 'BR' | 'MP' | 'CUSTOM',
     teamSize,
@@ -301,7 +373,12 @@ export async function updateTournament(tournamentId: string, formData: FormData)
     tournamentDate: toTemporalDateTime(tournamentDate),
     tournamentEnd: toTemporalDateTime(tournamentEnd),
     registrationEnd: toTemporalDateTime(registrationEnd),
-  });
+  };
+  if (statusRaw && ['DRAFT', 'PUBLISHED', 'ONGOING', 'COMPLETED', 'CANCELLED'].includes(statusRaw)) {
+    updatePayload.status = statusRaw;
+  }
+
+  await db.orm.public.Tournament.where({ id: tournamentId }).update(updatePayload);
 
   await db.orm.public.AuditLog.create({
     action: 'TOURNAMENT_UPDATED',

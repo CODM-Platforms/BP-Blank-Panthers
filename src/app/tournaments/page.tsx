@@ -89,9 +89,15 @@ export default async function PublicTournaments() {
                             </span>
                           </div>
                         </div>
-                        <span className="px-2 py-1 bg-red-500/10 text-red-400 text-[10px] font-mono rounded border border-red-500/20 uppercase tracking-widest">
-                          {t.status}
-                        </span>
+                        {t.status === 'ONGOING' ? (
+                          <span className="px-2 py-1 bg-red-500/10 text-red-400 text-[10px] font-mono font-bold rounded border border-red-500/20 uppercase tracking-widest flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> LIVE
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-mono rounded border border-blue-500/20 uppercase tracking-widest">
+                            {t.status}
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-col gap-2">

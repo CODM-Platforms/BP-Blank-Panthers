@@ -255,8 +255,15 @@ export default async function Home() {
                     className="bg-surface-container-low/80 backdrop-blur-xl border border-surface-container-high rounded-xl p-space-md flex items-center justify-between hover:border-primary-container/50 transition-colors group"
                   >
                     <div className="flex flex-col">
-                      <span className="font-label-sm text-label-sm tracking-widest text-primary-container uppercase font-mono text-[9px] mb-1">
-                        UPCOMING TOURNAMENT
+                      <span className="font-label-sm text-label-sm tracking-widest text-primary-container uppercase font-mono text-[9px] mb-1 flex items-center gap-1.5">
+                        {t.status === 'ONGOING' ? (
+                          <>
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="text-red-400 font-bold">LIVE ONGOING TOURNAMENT</span>
+                          </>
+                        ) : (
+                          'UPCOMING TOURNAMENT'
+                        )}
                       </span>
                       <span className="font-title-md text-title-md text-on-surface">{t.name}</span>
                       <span className="font-body-sm text-body-sm text-on-surface-variant mt-1">
