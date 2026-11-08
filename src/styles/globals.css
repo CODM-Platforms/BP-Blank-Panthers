@@ -78,3 +78,14 @@ body {
 .toggle-label {
   transition: all 0.3s;
 }
+
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgba(12, 14, 18, 0.88);
+  backdrop-filter: blur(8px);
+}

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Image as ImageIcon, Maximize2, Trash2, X } from 'lucide-react';
 import { addTournamentPhoto, deleteTournamentPhoto } from '@/app/admin/tournaments/actions';
 
 interface Photo {
@@ -18,8 +18,59 @@ interface Props {
 
 export default function TournamentPhotos({ tournamentId, photos }: Props) {
   const router = useRouter();
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const titleId = useId();
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activePhoto, setActivePhoto] = useState<Photo | null>(null);
+
+  const openPhoto = (photo: Photo) => {
+    setActivePhoto(photo);
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
+  };
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleClose = () => {
+      dialog.returnValue = '';
+      setActivePhoto(null);
+    };
+    dialog.addEventListener('close', handleClose);
+
+    let cleanupLightDismiss: (() => void) | undefined;
+    if (typeof HTMLDialogElement !== 'undefined' && !('closedBy' in HTMLDialogElement.prototype)) {
+      let pressedOutside = false;
+      const isOutside = (e: PointerEvent) => {
+        const r = dialog.getBoundingClientRect();
+        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      };
+      const onPointerDown = (e: PointerEvent) => {
+        pressedOutside = e.target === dialog && isOutside(e);
+      };
+      const onPointerUp = (e: PointerEvent) => {
+        if (pressedOutside && e.target === dialog && isOutside(e)) {
+          dialog.close();
+        }
+        pressedOutside = false;
+      };
+      dialog.addEventListener('pointerdown', onPointerDown);
+      dialog.addEventListener('pointerup', onPointerUp);
+      cleanupLightDismiss = () => {
+        dialog.removeEventListener('pointerdown', onPointerDown);
+        dialog.removeEventListener('pointerup', onPointerUp);
+      };
+    }
+
+    return () => {
+      dialog.removeEventListener('close', handleClose);
+      cleanupLightDismiss?.();
+    };
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,16 +157,30 @@ export default function TournamentPhotos({ tournamentId, photos }: Props) {
       {photos.length === 0 ? (
         <p className="text-outline text-sm italic">No result photos uploaded yet.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {photos.map((photo) => (
             <div key={photo.id} className="relative group bg-surface-container-lowest border border-surface-container-high rounded-lg overflow-hidden">
-              <img src={photo.imageUrl} alt={photo.caption ?? 'Result photo'} className="w-full aspect-square object-cover" />
-              {photo.caption && (
-                <p className="text-[11px] text-outline px-2 py-1 truncate">{photo.caption}</p>
-              )}
               <button
+                type="button"
+                onClick={() => openPhoto(photo)}
+                className="w-full text-left focus:outline-none"
+              >
+                <div className="relative w-full aspect-video bg-black/60 flex items-center justify-center overflow-hidden">
+                  <img src={photo.imageUrl} alt={photo.caption ?? 'Result photo'} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200" />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="px-2.5 py-1 bg-surface-container-lowest/90 text-on-surface text-xs font-mono rounded-full flex items-center gap-1">
+                      <Maximize2 className="w-3.5 h-3.5 text-primary-container" /> View
+                    </span>
+                  </div>
+                </div>
+                {photo.caption && (
+                  <p className="text-[11px] text-outline px-2.5 py-1.5 truncate border-t border-surface-container-high/50">{photo.caption}</p>
+                )}
+              </button>
+              <button
+                type="button"
                 onClick={() => handleDelete(photo.id)}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 title="Delete photo"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -124,6 +189,34 @@ export default function TournamentPhotos({ tournamentId, photos }: Props) {
           ))}
         </div>
       )}
+
+      <dialog
+        ref={dialogRef}
+        {...({ closedby: 'any' } as any)}
+        aria-labelledby={titleId}
+        className="m-auto w-[95vw] max-w-5xl max-h-[90vh] rounded-2xl bg-surface-container-low border border-surface-container-high text-on-surface p-0 shadow-2xl open:flex open:flex-col overflow-hidden"
+      >
+        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-surface-container-lowest border-b border-surface-container-high">
+          <h3 id={titleId} className="text-sm font-bold text-on-surface truncate">
+            {activePhoto?.caption || 'Match Result Photo'}
+          </h3>
+          <form method="dialog">
+            <button
+              type="submit"
+              autoFocus
+              aria-label="Close photo preview"
+              className="p-1.5 bg-red-500/15 hover:bg-red-500/30 border border-red-500/30 text-red-400 rounded-lg transition-colors flex items-center justify-center"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+        <div className="p-4 bg-black/90 flex items-center justify-center overflow-auto max-h-[80vh]">
+          {activePhoto && (
+            <img src={activePhoto.imageUrl} alt={activePhoto.caption ?? 'Result photo'} className="max-h-[75vh] max-w-full w-auto h-auto object-contain rounded" />
+          )}
+        </div>
+      </dialog>
     </div>
   );
 }

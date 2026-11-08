@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import GlobalHeader from '@/components/GlobalHeader';
+import TournamentPhotoGallery from '@/components/TournamentPhotoGallery';
 import { db } from '@/prisma/db';
 import { notFound } from 'next/navigation';
-import { toJsDate } from '@/lib/temporal';
+import { toJsDate, sanitizeForClient } from '@/lib/temporal';
 
 export default async function PublicTournamentDetail({ params }: { params: { id: string } }) {
   let tournament = null;
@@ -257,23 +258,10 @@ export default async function PublicTournamentDetail({ params }: { params: { id:
             )}
           </div>
 
-          {tournament.photos.length > 0 && (
-            <div className="flex flex-col gap-space-md mt-space-lg">
-              <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary-container">photo_camera</span> Result Photos
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-space-sm">
-                {tournament.photos.map((photo: any) => (
-                  <div key={photo.id} className="bg-surface-container-low/80 border border-surface-container-high rounded-xl overflow-hidden">
-                    <img src={photo.imageUrl} alt={photo.caption ?? tournament.name} className="w-full aspect-square object-cover" />
-                    {photo.caption && (
-                      <p className="text-xs text-outline px-space-sm py-2 truncate">{photo.caption}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <TournamentPhotoGallery
+            photos={sanitizeForClient(tournament.photos)}
+            tournamentName={tournament.name}
+          />
         </div>
       </main>
 
