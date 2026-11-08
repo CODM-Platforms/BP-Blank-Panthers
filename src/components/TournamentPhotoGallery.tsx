@@ -239,3 +239,4 @@ export default function TournamentPhotoGallery({ photos, tournamentName }: Props
     </div>
   );
 }
+
